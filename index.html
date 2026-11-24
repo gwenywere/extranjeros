@@ -184,6 +184,7 @@ footer h2 { font-family: var(--f-display); font-size: 16px; color: var(--fg); ma
 footer p, footer li { max-width: 100ch; margin: 4px 0; }
 footer ul { padding-left: 18px; margin: 6px 0 12px; }
 footer a { color: var(--accent); text-underline-offset: 2px; }
+footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must not widen the page on phones */
 
 @media (max-width: 1000px) {
   .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -294,7 +295,7 @@ footer a { color: var(--accent); text-underline-offset: 2px; }
         <div class="legend" id="lg-lev"></div>
         <div class="chart" id="c-lev"></div>
         <details><summary>Show data</summary><div class="table-wrap" id="t-lev"></div></details>
-        <div class="vars">INE · EPA · unemployed = active − employed · 2021 Q1: new population base</div>
+        <div class="vars">INE · EPA · unemployed = active − employed · dotted line: Romania and Bulgaria join the EU (Jan 2007), so their nationals move from non-EU to EU · 2021 Q1: new population base</div>
       </article>
 
       <article class="card span-5">
@@ -819,14 +820,23 @@ function stackChart(id, opt) {
   const st = d3.stack().keys(opt.layers.map((_, j) => j))(rows);
   const x = d3.scaleTime().domain(d3.extent(rows, (r) => r.t)).range([0, w]);
   const y = d3.scaleLinear().domain([0, d3.max(st[st.length - 1], (d) => d[1]) * 1.05]).nice(5).range([h, 0]);
-  timeDecor(g, x, h, w, opt);
+  timeDecor(g, x, h, w, { ...opt, events: [] }); // event markers go on top of the areas, below
   yAxis(g, y, w, opt.axisFmt || fk);
   xAxis(g, x, h, w);
   const area = d3.area().x((d) => x(d.data.t)).y0((d) => y(d[0])).y1((d) => y(d[1]));
   st.forEach((layer, j) => g.append('path').attr('fill', opt.layers[j].color).attr('d', area(layer))
     .attr('stroke', css('--surface')).attr('stroke-width', 1));
-  // timeDecor drew bands under the areas; redraw event lines on top so they stay visible
-  (opt.events || []).forEach((e) => { const xe = x(pd(e.t)); if (xe >= 0 && xe <= w) g.append('line').attr('class', 'brk').attr('x1', xe).attr('x2', xe).attr('y1', 0).attr('y2', h); });
+  // event markers on top of the areas; the label goes near the top, on whichever side has room
+  (opt.events || []).forEach((e) => {
+    const xe = x(pd(e.t));
+    if (xe < 0 || xe > w) return;
+    g.append('line').attr('class', 'brk').attr('x1', xe).attr('x2', xe).attr('y1', 0).attr('y2', h);
+    const t = g.append('text').attr('class', 'brk-lbl halo').attr('y', 12).text(e.label);
+    const tw = t.node().getComputedTextLength();
+    if (xe + 4 + tw <= w) t.attr('x', xe + 4);
+    else if (xe - 4 - tw >= 0) t.attr('x', xe - 4).attr('text-anchor', 'end');
+    else t.remove(); // no room on either side (narrow screens): the line alone, the note explains it
+  });
   const last = rows.length - 1;
   endLabels(g, opt.layers.map((L, j) => ({
     x: x(rows[last].t) + 6, y: y((st[j][last][0] + st[j][last][1]) / 2),
@@ -913,8 +923,8 @@ function dumbbell(id, rows, o) {
   const { g, w } = frame(el, rows.length * rh + m.t + m.b, m);
   const x = d3.scaleLinear().domain([0, o.max || d3.max(rows, (r) => Math.max(r.a, r.b))]).nice(4).range([0, w]);
   const H = rows.length * rh;
-  g.append('g').attr('class', 'gridlines').attr('transform', `translate(0,${H})`).call(d3.axisBottom(x).ticks(4).tickSize(-H).tickFormat(''));
-  g.append('g').attr('class', 'axis').attr('transform', `translate(0,${H})`).call(d3.axisBottom(x).ticks(4).tickFormat(F).tickSizeOuter(0));
+  g.append('g').attr('class', 'gridlines').attr('transform', `translate(0,${H})`).call(d3.axisBottom(x).ticks(narrow ? 3 : 4).tickSize(-H).tickFormat(''));
+  g.append('g').attr('class', 'axis').attr('transform', `translate(0,${H})`).call(d3.axisBottom(x).ticks(narrow ? 3 : 4).tickFormat(F).tickSizeOuter(0));
   rows.forEach((r, i) => {
     const cy = i * rh + rh / 2;
     g.append('text').attr('class', 'lbl').attr('x', -10).attr('y', cy + 4).attr('text-anchor', 'end').text(r.label);
@@ -1351,8 +1361,9 @@ function drawMap(id, o) {
     g.append('text').attr('class', 'lbl').attr('x', lxs(t)).attr('y', ly + 26).attr('text-anchor', 'middle').text(L.fmt(t));
   });
   if (L.noData) { // grey swatch under the ticks
-    g.append('rect').attr('x', lx).attr('y', ly + 33).attr('width', 12).attr('height', 10).attr('rx', 2).attr('fill', css('--grid'));
-    g.append('text').attr('class', 'lbl').attr('x', lx + 17).attr('y', ly + 42).text(`Not coloured: ${L.noData}`);
+    const nx = wide ? lx : pad;
+    g.append('rect').attr('x', nx).attr('y', ly + 33).attr('width', 12).attr('height', 10).attr('rx', 2).attr('fill', css('--grid'));
+    g.append('text').attr('class', 'lbl').attr('x', nx + 17).attr('y', ly + 42).text(`Not coloured: ${L.noData}`);
   }
 }
 const seqColor = (domain) => d3.scaleSequential(domain, d3.interpolateRgbBasis(['--seq0', '--seq1', '--seq2', '--seq3', '--seq4', '--seq5'].map(css)));

@@ -1,0 +1,1958 @@
+<!doctype html><html lang="en"><head><meta charset=utf8><title>Foreigners in Spain</title><meta name="description" content="Foreign nationals in Spain and the Basque Country: population, work, unemployment, Social Security affiliation, benefits and poverty, from official statistics (INE, Seguridad Social, SEPE, Eustat)."><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Same tokens, cards and tooltip as the Nacimientos pages (site/).
+   Series colours follow the group, everywhere on the page:
+   Spanish = --s2 (violet) · all foreign nationals = --s1 (teal) · EU foreigners = --s4 (amber) · non-EU foreigners = --s3 (red) · total = --fg-2, dashed. */
+:root {
+  --bg: #EDEFF0;
+  --surface: #FFFFFF;
+  --fg: #191B1C;
+  --fg-2: #595F61;
+  --muted: #7B8285;
+  --grid: color-mix(in oklab, #C2C9CC 40%, #FFFFFF);
+  --axis: #C2C9CC;
+  --border: rgba(25, 27, 28, 0.09);
+  --band: rgba(25, 27, 28, 0.045);
+  --accent: #23726C;
+  --on-accent: #FFFFFF;
+  --s1: #40BFB6;
+  --s2: #7740BF;
+  --s3: #BF4049;
+  --s4: #A8741F;
+  --neutral: #C2C9CC;
+  --seq0: #E0FEFA; --seq1: #50EADF; --seq2: #40BFB6; --seq3: #329992; --seq4: #23726C; --seq5: #144A46;
+  --f-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #191B1C; --surface: color-mix(in oklab, #191B1C 80%, #383B3D);
+    --fg: #EDEFF0; --fg-2: #C2C9CC; --muted: #9BA3A8;
+    --grid: color-mix(in oklab, #383B3D 70%, #191B1C); --axis: #595F61; --border: rgba(237, 239, 240, 0.08);
+    --band: rgba(237, 239, 240, 0.05);
+    --accent: #50EADF; --on-accent: #062623;
+    --s1: #40BFB6; --s2: #986CDC; --s3: #E66368; --s4: #E0A85C; --neutral: #595F61;
+    --seq0: #144A46; --seq1: #23726C; --seq2: #329992; --seq3: #40BFB6; --seq4: #50EADF; --seq5: #E0FEFA;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #191B1C; --surface: color-mix(in oklab, #191B1C 80%, #383B3D);
+  --fg: #EDEFF0; --fg-2: #C2C9CC; --muted: #9BA3A8;
+  --grid: color-mix(in oklab, #383B3D 70%, #191B1C); --axis: #595F61; --border: rgba(237, 239, 240, 0.08);
+  --band: rgba(237, 239, 240, 0.05);
+  --accent: #50EADF; --on-accent: #062623;
+  --s1: #40BFB6; --s2: #986CDC; --s3: #E66368; --s4: #E0A85C; --neutral: #595F61;
+  --seq0: #144A46; --seq1: #23726C; --seq2: #329992; --seq3: #40BFB6; --seq4: #50EADF; --seq5: #E0FEFA;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap {
+  max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+header.top { padding-block: 32px 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+h1 {
+  font-family: var(--f-display); font-weight: 600; font-size: clamp(28px, 4vw, 40px); line-height: 1.1;
+  margin: 6px 0 8px; letter-spacing: -0.01em; text-wrap: balance;
+}
+.lede { color: var(--fg-2); max-width: 72ch; margin: 0; }
+
+/* Section nav */
+.filters {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in oklab, var(--bg) 92%, transparent); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--border);
+}
+.nav { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding-block: 10px; font-size: 13px; }
+.nav a { color: var(--accent); text-underline-offset: 3px; white-space: nowrap; }
+.status { margin-left: auto; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 2px; }
+.seg button {
+  font: inherit; font-size: 12px; border: 0; background: transparent; color: var(--fg-2);
+  padding: 3px 9px; border-radius: 6px; cursor: pointer;
+}
+.seg button:hover:not([aria-pressed="true"]) { color: var(--fg); background: var(--bg); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+select {
+  font: inherit; font-size: 12.5px; color: var(--fg); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; max-width: 220px;
+}
+select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sub3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 28px; margin-top: 6px; }
+.sub2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 32px; margin-top: 6px; }
+.sub2 > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.sub2 h4 { font-family: var(--f-display); font-size: 14px; font-weight: 600; margin: 0; }
+@media (max-width: 1000px) { .sub2 { grid-template-columns: minmax(0, 1fr); } }
+.sub3 > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.sub3 h4 { font-family: var(--f-display); font-size: 14px; font-weight: 600; margin: 0; }
+@media (max-width: 1000px) { .sub3 { grid-template-columns: minmax(0, 1fr); } }
+.empty { display: grid; place-items: center; min-height: 160px; color: var(--muted); font-size: 13px; text-align: center; padding: 16px; }
+
+/* KPI tiles */
+.kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; padding-block: 20px 8px; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; min-width: 0; }
+.kpi .label { font-size: 12px; color: var(--fg-2); }
+.kpi .value { font-family: var(--f-display); font-size: 28px; font-weight: 600; line-height: 1.15; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.kpi .value small { font-size: 15px; font-weight: 500; color: var(--fg-2); margin-left: 2px; }
+.kpi .ref { font-size: 12px; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.kpi .ref b { font-weight: 600; color: var(--fg-2); }
+
+/* Sections and cards */
+.section-head { padding-top: 26px; }
+.section-head h2 { font-family: var(--f-display); font-size: 22px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+.section-head p { color: var(--fg-2); margin: 4px 0 0; max-width: 90ch; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; padding-block: 12px 8px; grid-auto-flow: row dense; }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 16px 18px 12px; min-width: 0; display: flex; flex-direction: column; gap: 6px;
+}
+.span-7 { grid-column: span 7; } .span-5 { grid-column: span 5; } .span-6 { grid-column: span 6; } .span-12 { grid-column: span 12; }
+.card h3 { font-family: var(--f-display); font-size: 16px; font-weight: 600; margin: 0; text-wrap: balance; }
+.card .sub { color: var(--fg-2); font-size: 12.5px; margin: 0; }
+.card .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 8px 16px; }
+.card .note { color: var(--fg-2); font-size: 12.5px; margin: 2px 0 0; }
+.card .vars { margin-top: auto; padding-top: 6px; font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); letter-spacing: 0.02em; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--fg-2); }
+.legend:empty { display: none; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.legend i.line { height: 3px; border-radius: 2px; width: 14px; vertical-align: 3px; }
+.legend i.dash { height: 0; border-radius: 0; width: 14px; border-top: 2px dashed var(--fg-2); vertical-align: 3px; }
+.legend i.dot { height: 0; border-radius: 0; width: 14px; border-top: 2px dotted var(--fg-2); vertical-align: 3px; }
+.legend i.area { background: var(--band); outline: 1px solid var(--axis); }
+.chart { width: 100%; position: relative; }
+
+/* nationality x birthplace matrix */
+.matrix { display: grid; grid-template-columns: auto 1fr 1fr; gap: 4px; font-size: 12.5px; margin-top: 6px; }
+.matrix .h { color: var(--fg-2); font-weight: 600; padding: 4px 8px; align-self: end; }
+.matrix .rh { color: var(--fg-2); font-weight: 600; padding: 8px; align-self: center; }
+.matrix .cell { border-radius: 8px; padding: 10px 12px; border: 1px solid var(--border); background: var(--bg); }
+.matrix .cell b { display: block; font-family: var(--f-display); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.matrix .cell span { color: var(--fg-2); }
+.matrix .cell i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+svg text { font-family: var(--f-body); }
+.axis text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.axis line, .axis path { stroke: var(--axis); }
+.gridlines line { stroke: var(--grid); }
+.gridlines path { display: none; }
+.lbl { fill: var(--fg-2); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.lbl-strong { fill: var(--fg); font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.lbl-in { font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.hover-rule { stroke: var(--fg-2); stroke-width: 1; }
+.brk { stroke: var(--fg-2); stroke-dasharray: 2 3; stroke-width: 1; }
+.brk-lbl { fill: var(--muted); font-size: 10px; }
+.band-lbl { fill: var(--muted); font-size: 10px; }
+
+#tip {
+  position: fixed; z-index: 20; pointer-events: none; background: var(--surface); color: var(--fg);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12px; line-height: 1.45;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.14); max-width: 300px; font-variant-numeric: tabular-nums;
+}
+#tip .t { font-weight: 600; margin-bottom: 2px; }
+#tip .row { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+#tip .row span:first-child { color: var(--fg-2); display: inline-flex; align-items: center; gap: 6px; }
+#tip .row em { font-style: normal; color: var(--muted); font-weight: 400; margin-left: 4px; }
+#tip .sw { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex: none; }
+
+details { margin-top: 4px; }
+summary { cursor: pointer; font-size: 12.5px; color: var(--accent); width: fit-content; }
+.table-wrap { overflow-x: auto; margin-top: 8px; max-height: 360px; overflow-y: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 5px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { position: sticky; top: 0; background: var(--surface); color: var(--fg-2); font-weight: 600; }
+
+footer { padding-block: 24px 40px; color: var(--muted); font-size: 12px; }
+footer h2 { font-family: var(--f-display); font-size: 16px; color: var(--fg); margin: 0 0 6px; }
+footer p, footer li { max-width: 100ch; margin: 4px 0; }
+footer ul { padding-left: 18px; margin: 6px 0 12px; }
+footer a { color: var(--accent); text-underline-offset: 2px; }
+
+@media (max-width: 1000px) {
+  .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .span-7, .span-5, .span-6 { grid-column: span 12; }
+}
+@media (max-width: 560px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .status { margin-left: 0; width: 100%; }
+  .kpi .value { font-size: 24px; }
+  .matrix .cell b { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<header class="top wrap">
+  <div class="eyebrow">INE · Seguridad Social · SEPE · Ministerio de Trabajo · INSS · Eustat</div>
+  <h1>Foreigners in Spain: work, unemployment, benefits and poverty</h1>
+  <p class="lede">What official statistics say about foreign nationals in Spain and the Basque Country: how many there are, how many work or look for work, how many receive unemployment benefits or minimum income, and how many are at risk of poverty. Hover or tap a chart for the values; every chart has its data table underneath.</p>
+</header>
+
+<div class="filters">
+  <nav class="wrap nav" aria-label="Sections">
+    <a href="#who">Who is foreign</a>
+    <a href="#shares">Share of the total</a>
+    <a href="#work">Work and unemployment</a>
+    <a href="#maps">Maps</a>
+    <a href="#sectors">Sectors</a>
+    <a href="#contracts">Contracts</a>
+    <a href="#jobs">Social Security</a>
+    <a href="#benefits">Benefits</a>
+    <a href="#poverty">Poverty</a>
+    <a href="#euskadi">Basque Country</a>
+    <a href="#sources">Sources</a>
+    <span class="status" id="status">Loading…</span>
+  </nav>
+</div>
+
+<main class="wrap">
+  <section class="kpis" id="kpis" aria-label="Latest figures"></section>
+
+  <!-- ===================== WHO ===================== -->
+  <section id="who">
+    <div class="section-head">
+      <h2>Who counts as foreign</h2>
+      <p>Statistics classify people by <b>nationality</b>, not by origin: an immigrant who becomes a Spanish citizen counts as Spanish. Counting by <b>place of birth</b> gives a much larger number. Everything below uses nationality unless it says "born".</p>
+    </div>
+    <div class="grid">
+      <article class="card span-5">
+        <div class="head"><div><h3>Nationality and place of birth</h3><p class="sub" id="nb-sub">Population of Spain</p></div></div>
+        <div class="chart" id="c-nb-bar"></div>
+        <div class="matrix" id="c-nb"></div>
+        <div class="vars">INE · Estadística Continua de Población · provisional</div>
+      </article>
+      <article class="card span-7">
+        <div class="head"><div><h3>Born abroad vs foreign nationality</h3><p class="sub">Share of the population. The gap is people born abroad who hold Spanish nationality</p></div></div>
+        <div class="legend" id="lg-pop"></div>
+        <div class="chart" id="c-pop"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-pop"></div></details>
+        <div class="vars">INE · ECP4961 · ECP4901 · ECP701 · ECP9161 · ECP5381</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== SHARES ===================== -->
+  <section id="shares">
+    <div class="section-head">
+      <h2>Share of the total</h2>
+      <p>Foreign nationals' share of each group, next to their share of the adult population (grey area). A line above the grey area means foreigners make up more of that group than of the population aged 16+.</p>
+    </div>
+    <div class="grid">
+      <article class="card span-12">
+        <div class="head"><div><h3>Foreign nationals as a share of…</h3><p class="sub">Percent of each total that has foreign nationality</p></div></div>
+        <div class="legend" id="lg-shares"></div>
+        <div class="chart" id="c-shares"></div>
+        <p class="note">Social Security counts registrations, not people (someone with two jobs counts twice). Unemployment-benefit recipients are annual averages, shown mid-year. IMV counts one recipient per household.</p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-shares"></div></details>
+        <div class="vars">EPA · Afiliados medios · Anuario PEX-1 · INSS</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== WORK ===================== -->
+  <section id="work">
+    <div class="section-head">
+      <h2>Work and unemployment</h2>
+      <p>From the Labour Force Survey (EPA). Foreign nationals are more likely to be in work <i>and</i> more likely to be unemployed than Spanish nationals: more of them are of working age and in the labour market.</p>
+    </div>
+    <div class="grid">
+      <article class="card span-12">
+        <div class="head">
+          <div><h3 id="rates-title">Unemployment rate</h3><p class="sub" id="rates-sub"></p></div>
+          <div class="controls">
+            <div class="seg" id="sw-rate" role="group" aria-label="Measure"></div>
+            <div class="seg" id="sw-rate-g" role="group" aria-label="Groups"></div>
+          </div>
+        </div>
+        <div class="legend" id="lg-rates"></div>
+        <div class="chart" id="c-rates"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-rates"></div></details>
+        <div class="vars">INE · EPA · tables 65290, 65299, 65300, 65309 · quarterly · "Spanish" includes dual nationals</div>
+      </article>
+
+      <article class="card span-7">
+        <div class="head">
+          <div><h3 id="lev-title">Foreign nationals in work</h3><p class="sub">People, EU and non-EU nationals stacked</p></div>
+          <div class="seg" id="sw-lev" role="group" aria-label="Measure"></div>
+        </div>
+        <div class="legend" id="lg-lev"></div>
+        <div class="chart" id="c-lev"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-lev"></div></details>
+        <div class="vars">INE · EPA · unemployed = active − employed · 2021 Q1: new population base</div>
+      </article>
+
+      <article class="card span-5">
+        <div class="head"><div><h3>Three ways to count unemployed foreigners</h3><p class="sub">Foreign nationals, Spain, 2025</p></div></div>
+        <div class="chart" id="c-count"></div>
+        <p class="note">Three different statistics. The EPA is a household survey; registered unemployment counts people signed up at public employment offices; not every unemployed person is entitled to a benefit. They should not be subtracted from each other.</p>
+        <div class="vars">SEPE · Informe del Mercado de Trabajo de las Personas Extranjeras 2026</div>
+      </article>
+
+      <article class="card span-12" id="census-card">
+        <div class="head">
+          <div><h3>Work status by country of birth</h3><p class="sub" id="cen-sub">Population aged 16+, from the annual census</p></div>
+          <div class="controls">
+            <div class="seg" id="sw-cen-view" role="group" aria-label="Group by"></div>
+            <div class="seg" id="sw-cen-sex" role="group" aria-label="Sex"></div>
+            <div class="seg" id="sw-cen-year" role="group" aria-label="Year"></div>
+            <label class="sel"><span class="vh">Region or province</span><select id="sel-cen-region"></select></label>
+          </div>
+        </div>
+        <div class="legend" id="lg-cen"></div>
+        <div class="chart" id="c-cen"><div class="empty">Loading census data…</div></div>
+        <p class="note" id="cen-note">From INE's annual census, which takes work status from Social Security and employment-office registers, not from a survey. Someone out of work who is not registered at an employment office counts as inactive, not unemployed, so unemployment rates here are not comparable with the EPA's. Born abroad includes people who have since become Spanish citizens.</p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-cen"></div></details>
+        <div class="vars">INE · Censo anual de población · table 67129 · inactive = pensioners + students + other inactive</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== MAPS ===================== -->
+  <section id="maps">
+    <div class="section-head">
+      <h2>Regions and provinces</h2>
+      <p>Two maps from two sources. The province map uses INE's annual census, which counts everyone, by nationality or by country of birth. The region map uses the Labour Force Survey (EPA), the source of the official unemployment rate, as an annual average; it is a sample, so small groups in small regions are left out.</p>
+    </div>
+    <div class="grid">
+      <article class="card span-12" id="prov-card">
+        <div class="head">
+          <div><h3 id="pm-title">By province</h3><p class="sub" id="pm-sub">Census, people aged 16+</p></div>
+          <div class="controls">
+            <div class="seg" id="sw-pm-metric" role="group" aria-label="Measure"></div>
+            <label class="sel"><span class="vh">Group</span><select id="sel-pm-group"></select></label>
+            <div class="seg" id="sw-pm-sex" role="group" aria-label="Sex"></div>
+            <div class="seg" id="sw-pm-year" role="group" aria-label="Year"></div>
+          </div>
+        </div>
+        <div class="chart" id="c-pm"><div class="empty">Loading map…</div></div>
+        <p class="note" id="pm-note">Click a province to open it in "Work status by country of birth" above. Unemployment from the census counts only people registered as unemployed, so it is lower than the EPA's.</p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-pm"></div></details>
+        <div class="vars">INE · Censo anual de población · tables 67129 (country of birth) and 67130 (nationality) · groups with fewer than 300 people in a province are not coloured</div>
+      </article>
+
+      <article class="card span-12" id="reg-card">
+        <div class="head">
+          <div><h3 id="rm-title">By region</h3><p class="sub" id="rm-sub">EPA, annual average</p></div>
+          <div class="controls">
+            <div class="seg" id="sw-rm-metric" role="group" aria-label="Measure"></div>
+            <div class="seg" id="sw-rm-group" role="group" aria-label="Group"></div>
+            <div class="seg" id="sw-rm-sex" role="group" aria-label="Sex"></div>
+            <label class="sel"><span class="vh">Year</span><select id="sel-rm-year"></select></label>
+          </div>
+        </div>
+        <div class="chart" id="c-rm"><div class="empty">Loading map…</div></div>
+        <p class="note">Annual average of the four quarterly EPA estimates. Regions where the group is under 5,000 people in the estimate are not coloured: INE warns such figures have large sampling errors. Ceuta and Melilla are shown as dots.</p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-rm"></div></details>
+        <div class="vars">INE · EPA · tables 65290 (population 16+), 65299 (active), 65309 (employed) · rates computed from annual averages</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== SECTORS ===================== -->
+  <section id="sectors">
+    <div class="section-head">
+      <h2>Sectors</h2>
+      <p>Where foreign nationals work, and how much of each sector's workforce they are. Foreign nationals are over-represented in domestic work, agriculture, hospitality and construction, and under-represented in public administration, education and finance.</p>
+    </div>
+    <div class="grid">
+      <article class="card span-12" id="sec-card">
+        <div class="head">
+          <div><h3>Employed foreign nationals by sector</h3><p class="sub" id="sec-sub"></p></div>
+          <div class="controls">
+            <div class="seg" id="sw-sec-sort" role="group" aria-label="Sort by"></div>
+            <div class="seg" id="sw-sec-sex" role="group" aria-label="Sex"></div>
+            <div class="seg" id="sw-sec-year" role="group" aria-label="Year"></div>
+            <label class="sel"><span class="vh">Region or province</span><select id="sel-sec-region"></select></label>
+          </div>
+        </div>
+        <div class="chart" id="c-sec"><div class="empty">Loading…</div></div>
+        <p class="note">From the census: people in work on 1 January, by the section of activity (CNAE) of their job, taken from Social Security and tax registers, so informal work is not counted. The dark mark on each share bar is foreign nationals' share of all workers; shares are not shown for sectors with fewer than 500 workers in the selected place.</p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-sec"></div></details>
+        <div class="vars">INE · Censo anual de población · table 69964 · employed 16+ by nationality and economic activity (CNAE-2009 sections)</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== CONTRACTS ===================== -->
+  <section id="contracts">
+    <div class="section-head">
+      <h2>Contracts and occupations, 2025</h2>
+      <p>Employment contracts registered with the public employment services in 2025, from SEPE's annual report. A contract is not a person: foreign nationals signed 3,990,538 contracts but were 1,738,476 people, 2.3 contracts each, so their share of contracts (25.5%) is much higher than their share of jobs (14.1% of Social Security affiliates).</p>
+    </div>
+    <div class="grid">
+      <article class="card span-12" id="occ-card">
+        <div class="head"><div><h3>The 10 occupations with most contracts for foreign nationals</h3>
+          <p class="sub">Contracts signed by foreign nationals in 2025, and their share of all contracts in that occupation</p></div></div>
+        <div class="chart" id="c-occ"></div>
+        <p class="note" id="occ-note"></p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-occ"></div></details>
+        <div class="vars">SEPE · Informe del Mercado de Trabajo de las Personas Extranjeras 2026, pp. 54–55 (SISPE, contracts registered in 2025) · share = foreign ÷ (foreign + Spanish)</div>
+      </article>
+
+      <article class="card span-6" id="grp-card">
+        <div class="head"><div><h3>Contracts by broad occupational group</h3>
+          <p class="sub">Share of each group's contracts in 2025, foreign vs Spanish nationals</p></div></div>
+        <div class="legend" id="lg-grp"></div>
+        <div class="chart" id="c-grp"></div>
+        <p class="note">Half of all contracts signed by foreign nationals are for elementary occupations (labourers, cleaners, kitchen assistants), against just over a quarter of Spanish nationals' contracts.</p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-grp"></div></details>
+        <div class="vars">SEPE report p. 53 · Grandes Grupos of the CNO-11 classification</div>
+      </article>
+
+      <article class="card span-6" id="ctype-card">
+        <div class="head"><div><h3>Type of contract</h3>
+          <p class="sub">Contracts signed by foreign nationals in 2025, by duration and working time</p></div></div>
+        <div class="legend" id="lg-ctype"></div>
+        <div class="chart" id="c-ctype"></div>
+        <h4 style="margin-top:12px">Temporary and part-time contracts, 2016 → 2025</h4>
+        <p class="sub">Share of foreign nationals' contracts. The 2022 labour reform cut temporary contracts, most of all for men</p>
+        <div class="legend" id="lg-ctrend"></div>
+        <div class="chart" id="c-ctrend"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-ctype"></div></details>
+        <div class="vars">SEPE report pp. 36–38 · fixed-discontinuous = permanent contracts for seasonal work</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== JOBS ===================== -->
+  <section id="jobs">
+    <div class="section-head">
+      <h2>Social Security affiliation</h2>
+      <p>Registered jobs paying Social Security contributions, monthly averages. It counts registrations, not people. From late April 2026 the extraordinary regularisation explains part of the increase.</p>
+    </div>
+    <div class="grid">
+      <article class="card span-7">
+        <div class="head">
+          <div><h3>Foreign affiliates</h3><p class="sub" id="aff-sub"></p></div>
+          <div class="seg" id="sw-aff" role="group" aria-label="Split"></div>
+        </div>
+        <div class="legend" id="lg-aff"></div>
+        <div class="chart" id="c-aff"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-aff"></div></details>
+        <div class="vars">Seguridad Social · PX-Web · self-employed = RETA + SETA · domestic-work scheme created in 2012</div>
+      </article>
+      <article class="card span-5">
+        <div class="head"><div><h3>The 15 largest nationalities</h3><p class="sub" id="ctry-sub"></p></div></div>
+        <div class="legend" id="lg-ctry"></div>
+        <div class="chart" id="c-ctry"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-ctry"></div></details>
+        <div class="vars">Seguridad Social · last day of the month (not the monthly average)</div>
+      </article>
+
+      <article class="card span-12" id="scheme-card">
+        <div class="head"><div><h3>Who the foreign affiliates are, 31 December 2025</h3>
+          <p class="sub" id="sch-sub">Foreign nationals registered with Social Security, by scheme, sex, nationality, type of work and age</p></div></div>
+        <div class="sub2">
+          <div>
+            <h4>Men and women in each scheme</h4>
+            <p class="sub">Right: the scheme's share of all foreign affiliates</p>
+            <div class="legend" id="lg-sch"></div>
+            <div class="chart" id="c-sch"></div>
+          </div>
+          <div>
+            <h4>EU and non-EU nationals, by sex</h4>
+            <div class="legend" id="lg-who-nat"></div>
+            <div class="chart" id="c-who-nat"></div>
+            <h4 style="margin-top:8px">Employees and self-employed, by sex</h4>
+            <div class="legend" id="lg-who-dep"></div>
+            <div class="chart" id="c-who-dep"></div>
+            <h4 style="margin-top:8px">Age</h4>
+            <div class="legend" id="lg-who-age"></div>
+            <div class="chart" id="c-who-age"></div>
+          </div>
+        </div>
+        <h4 style="margin-top:14px">Contracts in the General scheme</h4>
+        <p class="sub">Foreign affiliates by type of contract and working time; right: their share of all affiliates with that kind of contract</p>
+        <div class="chart" id="c-rgc"></div>
+        <p class="note" id="sch-note"></p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-sch"></div></details>
+        <div class="vars">SEPE · Informe del Mercado de Trabajo de las Personas Extranjeras 2026, pp. 26–30 (Seguridad Social, 31 Dec 2025) · General scheme here excludes the agricultural and domestic special systems</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== BENEFITS ===================== -->
+  <section id="benefits">
+    <div class="section-head">
+      <h2>Benefits</h2>
+      <p>Unemployment benefits are either <b>contributory</b>, paid for by the worker's previous contributions, or <b>assistance</b> subsidies with means tests. The Minimum Living Income (IMV) is a national minimum income for households with low income; it requires at least one year of legal residence.</p>
+    </div>
+    <div class="grid">
+      <article class="card span-7">
+        <div class="head"><div><h3>Foreign recipients of unemployment benefits</h3><p class="sub">Annual average, by type. Label: share of all recipients who are foreign</p></div></div>
+        <div class="legend" id="lg-ben"></div>
+        <div class="chart" id="c-ben"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-ben"></div></details>
+        <div class="vars">Ministerio de Trabajo · Anuario de Estadísticas PEX-1 (SEPE) · 2020 includes furlough (ERTE) effects</div>
+      </article>
+      <article class="card span-5">
+        <div class="head"><div><h3>On 31 December 2025</h3><p class="sub" id="ben25-sub">Foreign recipients of unemployment benefits, by type</p></div></div>
+        <div class="chart" id="c-ben25"></div>
+        <p class="note">A count on one day, not an annual average, so it is not directly comparable with the annual averages.</p>
+        <div class="vars">SEPE · Informe del Mercado de Trabajo de las Personas Extranjeras 2026</div>
+      </article>
+      <article class="card span-12">
+        <div class="head"><div><h3>Minimum Living Income (IMV) recipients</h3><p class="sub">Household heads receiving the IMV, by nationality. Other household members are not broken down</p></div></div>
+        <div class="legend" id="lg-imv"></div>
+        <div class="chart" id="c-imv"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-imv"></div></details>
+        <div class="vars">Seguridad Social (INSS) · transparency request published by Maldita.es</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== POVERTY ===================== -->
+  <section id="poverty">
+    <div class="section-head">
+      <h2>Poverty and social exclusion</h2>
+      <p>From the Living Conditions Survey (ECV), people aged 16+. The year is the survey year; income refers to the year before. EU and non-EU foreigners are shown separately because their situations differ a lot.</p>
+    </div>
+    <div class="grid">
+      <article class="card span-12">
+        <div class="head">
+          <div><h3 id="pov-title"></h3><p class="sub" id="pov-sub"></p></div>
+          <div class="seg" id="sw-pov" role="group" aria-label="Measure"></div>
+        </div>
+        <div class="legend" id="lg-pov"></div>
+        <div class="chart" id="c-pov"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-pov"></div></details>
+        <div class="vars">INE · Encuesta de Condiciones de Vida · tables 60258, 10009</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== EUSKADI ===================== -->
+  <section id="euskadi">
+    <div class="section-head">
+      <h2>Basque Country (Euskadi)</h2>
+      <p>The EPA sample of foreign nationals in the Basque Country is small, so quarterly rates jump around; the chart shows a 4-quarter average by default. Eustat counts by place of birth, not nationality, so its figures are not directly comparable with the EPA's.</p>
+    </div>
+    <div class="grid">
+      <article class="card span-6">
+        <div class="head">
+          <div><h3>Unemployment rate</h3><p class="sub" id="pv-sub"></p></div>
+          <div class="seg" id="sw-pv" role="group" aria-label="Smoothing"></div>
+        </div>
+        <div class="legend" id="lg-pv"></div>
+        <div class="chart" id="c-pv"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-pv"></div></details>
+        <div class="vars">INE · EPA, Basque Country · table 65336</div>
+      </article>
+      <article class="card span-6">
+        <div class="head"><div><h3>Foreign Social Security affiliates</h3><p class="sub">Monthly average, Basque Country</p></div></div>
+        <div class="chart" id="c-pvaff"></div>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-pvaff"></div></details>
+        <div class="vars">Seguridad Social · PX-Web</div>
+      </article>
+      <article class="card span-12">
+        <div class="head">
+          <div><h3>Work status by continent of birth</h3><p class="sub" id="eus-sub">Population aged 16+</p></div>
+          <div class="controls">
+            <div class="seg" id="sw-eus-sex" role="group" aria-label="Sex"></div>
+            <div class="seg" id="sw-eus-terr" role="group" aria-label="Province"></div>
+          </div>
+        </div>
+        <div class="legend" id="lg-eus"></div>
+        <div class="chart" id="c-eus"></div>
+        <p class="note">Counted from the population register (census), not a sample. Born abroad includes people who have since become Spanish citizens.</p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-eus"></div></details>
+        <div class="vars">Eustat · tbl0021467 · census of population, activity · born abroad = sum of the four continents</div>
+      </article>
+      <article class="card span-12" id="rgi-card">
+        <div class="head"><div><h3>Basque minimum income (RGI)</h3><p class="sub">The Renta de Garantía de Ingresos tops up the income of households below a minimum, including people with low pensions or low wages. It is a Basque programme, separate from the national IMV.</p></div></div>
+        <div class="sub3">
+          <div>
+            <h4>Share of adults vs share of recipients, 2024</h4>
+            <p class="sub" id="rgi-share-sub"></p>
+            <div class="legend" id="lg-rgi-share"></div>
+            <div class="chart" id="c-rgi-share"></div>
+          </div>
+          <div>
+            <h4>Receiving it, by nationality, 2024</h4>
+            <p class="sub">Recipients as a share of each population</p>
+            <div class="chart" id="c-rgi"></div>
+            <p class="note" id="rgi-note"></p>
+          </div>
+          <div>
+            <h4>Holders per 100 adults, by place of birth, 2023</h4>
+            <p class="sub">RGI holders during the year ÷ people aged 16+ born there</p>
+            <div class="chart" id="c-rgi-birth"></div>
+          </div>
+        </div>
+        <p class="note" id="rgi-foot"></p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-rgi"></div></details>
+        <div class="vars">2024: Ministerio de Inclusión, Marco Estratégico II · 2023: Lanbide statistic of income-guarantee recipients, nationality and birthplace as reported by Gasteiz Hoy · adults 16+: INE census tables 67129, 67130</div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap" id="sources">
+  <h2>Sources and notes</h2>
+  <ul>
+    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=65309" target="_blank" rel="noopener noreferrer">INE, Encuesta de Población Activa (EPA)</a>, tables 65290, 65299, 65300, 65309 and 65336: activity, employment and unemployment by nationality, Spain and Basque Country, quarterly 2002–2026. Survey estimates with sampling error.</li>
+    <li><a href="https://w6.seg-social.es/PXWeb/pxweb/es/Afiliados%20en%20alta%20laboral/" target="_blank" rel="noopener noreferrer">Seguridad Social, PX-Web</a>: average affiliates (foreigners by sex, region, scheme, EU / non-EU; total system), monthly from 2012; affiliates by nationality on the last day of the month.</li>
+    <li><a href="https://www.mites.gob.es/es/estadisticas/anuarios/index.htm" target="_blank" rel="noopener noreferrer">Ministerio de Trabajo, Anuario de Estadísticas</a>, table PEX-1 (SEPE data): foreign recipients of unemployment benefits, annual averages 2013–2024. The Employment Activation Programme existed only in 2015–2020.</li>
+    <li><a href="https://maldita.es/prebunking/20260710/ingreso-minimo-vital-espa%C3%B1oles-extranjeros/" target="_blank" rel="noopener noreferrer">Seguridad Social (INSS), via Maldita.es</a>: IMV recipients by nationality, monthly June 2020 – June 2026 (data released on a transparency request).</li>
+    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=60258" target="_blank" rel="noopener noreferrer">INE, Encuesta de Condiciones de Vida</a>, tables 60258 and 10009: AROPE and its components by nationality, 2008–2025. AROPE follows the "Europa 2030" definition from 2014; before that only the earlier "Europa 2020" definition exists (dotted line).</li>
+    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=82104" target="_blank" rel="noopener noreferrer">INE, Estadística Continua de Población</a> and <a href="https://www.ine.es/dyngs/Prensa/ECP3T26.htm" target="_blank" rel="noopener noreferrer">press release of 1 October 2026</a>: population by nationality and by place of birth (2026 provisional). Half-yearly to 2020, quarterly since 2021.</li>
+    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67129&amp;L=0" target="_blank" rel="noopener noreferrer">INE, Censo anual de población, table 67129</a>: population 16+ by region and province, sex, country of birth (17 countries and the rest of each continent) and relation to activity, 1 January 2021–2024. Work status comes from Social Security and employment-office registers.</li>
+    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=65336" target="_blank" rel="noopener noreferrer">INE, EPA by region and nationality</a>, tables 65290 (population 16+), 65299 (active) and 65309 (employed): annual averages for the region map. <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=69964&amp;L=0" target="_blank" rel="noopener noreferrer">INE census table 69964</a>: employed people by nationality and economic section, by province, 2021–2024. Province shapes simplified from <a href="https://gadm.org" target="_blank" rel="noopener noreferrer">GADM</a>.</li>
+    <li><a href="https://www.sepe.es/dctm/informes%3A09019af48026a2c4/RElTRVdFQg%3D%3D/4832-1.pdf" target="_blank" rel="noopener noreferrer">SEPE, Informe del Mercado de Trabajo de las Personas Extranjeras 2026</a> (2025 data): registered unemployment and benefit recipients on 31 December 2025; foreign affiliates by scheme, sex, nationality, type of work, age and contract (Seguridad Social, 31 Dec 2025); contracts by type, working time and occupation (SISPE, all of 2025). The report publishes these only in the PDF; the figures were read from it page by page and checked against its own totals (see <code>data/sepe_informe_extranjeros_2025.README.txt</code>).</li>
+    <li><a href="https://www.eustat.eus/elementos/tbl0021467_c.html" target="_blank" rel="noopener noreferrer">Eustat</a> (table tbl0021467, census of population): population 16+ by activity and continent of birth, by province and sex, Basque Country, 1 January 2025.</li>
+    <li><a href="https://bibliovirtual.inclusion.gob.es/documents/d/asset-library-6602793/indicadores_marco-estrategico-ii" target="_blank" rel="noopener noreferrer">Ministerio de Inclusión, indicadores del Marco Estratégico II</a>: Basque minimum income (RGI) 2024; IMV recipients December 2025.</li>
+    <li><a href="https://opendata.euskadi.eus/contenidos/estadistica/estadisticas_ebpgi2023/opendata/2023_Estadistica-de-Personas-Beneficiarias-de-Prestaciones-de-Garantia-de-Ingresos-en-Euskadi.xlsx" target="_blank" rel="noopener noreferrer">Lanbide / Gobierno Vasco, Estadística de personas beneficiarias de prestaciones de garantía de ingresos 2023</a>: RGI holders. The open tables have no nationality or birthplace; those figures are as reported by <a href="https://www.gasteizhoy.com/cuantos-perceptores-rgi-son-extranjeros/" target="_blank" rel="noopener noreferrer">Gasteiz Hoy</a> (27 Aug 2024), and its totals, sex and territory figures match the official tables. Adults by nationality: <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67130&amp;L=0" target="_blank" rel="noopener noreferrer">INE census table 67130</a>.</li>
+  </ul>
+  <p>Shaded periods mark the Great Recession (mid-2008 to 2013) and the COVID year 2020. In January 2007 Romania and Bulgaria joined the EU, so their nationals move from the non-EU to the EU series (dotted line). In 2021 Q1 INE re-based the EPA on new population estimates. There is no official figure for how many foreigners "do not contribute".</p>
+  <p id="foot-gen"></p>
+</footer>
+
+<div id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = d3.format(',');
+const fk = (v) => d3.format('.3~s')(v).replace('G', 'B');
+const fp = (v) => v.toFixed(1) + '%';
+const fp0 = (v) => Math.round(v) + '%';
+let D = null;
+
+// ---------- groups: colour follows the group, everywhere ----------
+const C = () => ({ es: css('--s2'), fx: css('--s1'), eu: css('--s4'), neu: css('--s3'), total: css('--fg-2'), neutral: css('--neutral') });
+const RECESSIONS = [['2008-07-01', '2013-12-31', 'Great Recession'], ['2020-03-01', '2020-12-31', 'COVID']];
+const EU_2007 = { t: '2007-01-01', label: 'Romania & Bulgaria join the EU' };
+const REGULARISATION = { t: '2026-04-25', label: 'regularisation' };
+
+// ---------- dates ----------
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const pd = (s) => new Date(s + 'T00:00:00');
+function dateLabel(freq, iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  if (freq === 'Q') return `${y} Q${Math.ceil(m / 3)}`;
+  if (freq === 'M') return `${MON[m - 1]} ${y}`;
+  if (freq === 'Y') return String(y);
+  return `${d} ${MON[m - 1]} ${y}`;
+}
+const TOL = { Q: 50, M: 20, Y: 190, D: 200 }; // days within which a hover picks a series' point
+
+// series from a block: { label, short, color, dash, width, freq, pts: [{ t, k, v }] }
+function ser(block, vals, label, color, o = {}) {
+  return {
+    label, short: o.short ?? label, color, dash: o.dash, width: o.width, markers: o.markers, noLabel: o.noLabel, noTip: o.noTip,
+    freq: block.freq,
+    pts: block.t.map((k, i) => ({ t: pd(k), k, v: vals[i] })).filter((p) => o.keepNull || p.v != null),
+  };
+}
+
+// ---------- tooltip ----------
+const tip = $('#tip');
+function showTip(ev, html) {
+  tip.innerHTML = html; tip.hidden = false;
+  const pad = 14, r = tip.getBoundingClientRect();
+  let x = ev.clientX + pad, y = ev.clientY + pad;
+  if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - pad;
+  if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - pad;
+  tip.style.left = Math.max(8, x) + 'px'; tip.style.top = Math.max(8, y) + 'px';
+}
+const hideTip = () => { tip.hidden = true; };
+const row = (label, value, color, extra) =>
+  `<div class="row"><span>${color ? `<i class="sw" style="background:${color}"></i>` : ''}${label}</span><b>${value}${extra ? `<em>${extra}</em>` : ''}</b></div>`;
+
+function frame(el, height, m) {
+  el.innerHTML = '';
+  const W = el.clientWidth;
+  const svg = d3.select(el).append('svg').attr('width', W).attr('height', height).attr('viewBox', `0 0 ${W} ${height}`).attr('role', 'img');
+  const g = svg.append('g').attr('transform', `translate(${m.l},${m.t})`);
+  return { svg, g, w: Math.max(10, W - m.l - m.r), h: height - m.t - m.b, W };
+}
+function legend(id, items) {
+  $(id).innerHTML = items.map((s) => {
+    const kind = s.kind || (s.dash ? 'dash' : 'line');
+    const style = kind === 'line' || kind === 'box' ? `background:${s.color}` : kind === 'dash' || kind === 'dot' ? `border-top-color:${s.color}` : '';
+    return `<span><i class="${kind === 'box' ? '' : kind}" style="${style}"></i>${s.label}</span>`;
+  }).join('');
+}
+function seg(id, options, current, onPick) {
+  const el = $(id);
+  el.innerHTML = options.map(([v, label]) => `<button type="button" data-v="${v}" aria-pressed="${v === current}">${label}</button>`).join('');
+  el.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => onPick(b.dataset.v)));
+}
+
+// time axis + optional recession bands and event markers
+function timeDecor(g, x, h, w, opt) {
+  if (opt.bands !== false) {
+    RECESSIONS.forEach(([a, b, name]) => {
+      const x0 = Math.max(0, x(pd(a))), x1 = Math.min(w, x(pd(b)));
+      if (x1 <= x0) return;
+      g.append('rect').attr('x', x0).attr('width', x1 - x0).attr('y', 0).attr('height', h).attr('fill', css('--band'));
+      if (x1 - x0 > 34) g.append('text').attr('class', 'band-lbl').attr('x', (x0 + x1) / 2).attr('y', -5).attr('text-anchor', 'middle').text(name);
+    });
+  }
+  (opt.events || []).forEach((e) => {
+    const xe = x(pd(e.t));
+    if (xe < 0 || xe > w) return;
+    g.append('line').attr('class', 'brk').attr('x1', xe).attr('x2', xe).attr('y1', 0).attr('y2', h);
+    const right = xe > w - 120;
+    g.append('text').attr('class', 'brk-lbl halo').attr('x', xe + (right ? -4 : 4)).attr('y', h - 6)
+      .attr('text-anchor', right ? 'end' : 'start').text(e.label);
+  });
+}
+function xAxis(g, x, h, w) {
+  const years = (x.domain()[1] - x.domain()[0]) / 3.15e10;
+  const every = years > 16 ? (w < 500 ? 8 : 4) : years > 7 ? (w < 500 ? 4 : 2) : 1;
+  g.append('g').attr('class', 'axis').attr('transform', `translate(0,${h})`)
+    .call(d3.axisBottom(x).ticks(d3.timeYear.every(every)).tickFormat(d3.timeFormat('%Y')).tickSizeOuter(0));
+}
+function yAxis(g, y, w, f) {
+  g.append('g').attr('class', 'gridlines').call(d3.axisLeft(y).ticks(5).tickSize(-w).tickFormat(''));
+  g.append('g').attr('class', 'axis').call(d3.axisLeft(y).ticks(5).tickSize(0).tickPadding(8).tickFormat(f)).select('.domain').remove();
+}
+function endLabels(g, items, h) {
+  // items: [{ x, y, t }]; labels closer than 13px are pushed apart, then kept inside the plot
+  items.sort((a, b) => a.y - b.y);
+  items.forEach((e, i) => { if (i && e.y - items[i - 1].y < 13) e.y = items[i - 1].y + 13; });
+  const over = items.length ? items[items.length - 1].y - (h + 4) : 0;
+  if (over > 0) items.forEach((e) => { e.y -= over; });
+  items.forEach((e) => g.append('text').attr('class', 'lbl-strong halo').attr('x', e.x).attr('y', e.y + 4).text(e.t));
+}
+
+// ---------- line chart over time (series may have different frequencies) ----------
+// opt: { series, fmt, axisFmt, zero, height, bands, events, area: { series index, label } , gap: [i, j], labelW, yMin }
+function timeChart(id, opt) {
+  const el = $(id);
+  const narrow = el.clientWidth < 560;
+  const m = { t: 16, r: narrow ? 58 : (opt.labelW || 170), b: 24, l: 46 };
+  const { g, w, h } = frame(el, opt.height || 280, m);
+  const all = opt.series.flatMap((s) => s.pts);
+  const x = d3.scaleTime().domain(opt.xDomain || d3.extent(all, (p) => p.t)).range([0, w]);
+  let [lo, hi] = d3.extent(all, (p) => p.v);
+  const pad = (hi - lo) * 0.06 || 1;
+  lo = opt.zero ? 0 : (opt.yMin != null ? opt.yMin : lo - pad); hi += pad;
+  const y = d3.scaleLinear().domain([lo, hi]).nice(5).range([h, 0]);
+  timeDecor(g, x, h, w, opt);
+  yAxis(g, y, w, opt.axisFmt || opt.fmt);
+  xAxis(g, x, h, w);
+
+  if (opt.area != null) {
+    const s = opt.series[opt.area];
+    g.append('path').attr('fill', css('--band')).attr('stroke', 'none')
+      .attr('d', d3.area().x((p) => x(p.t)).y0(y(Math.max(lo, 0))).y1((p) => y(p.v))(s.pts));
+  }
+  if (opt.gap) {
+    const [a, b] = opt.gap.map((i) => opt.series[i]);
+    const byK = new Map(b.pts.map((p) => [p.k, p.v]));
+    const pts = a.pts.filter((p) => byK.has(p.k));
+    g.append('path').attr('fill', a.color).attr('opacity', 0.12)
+      .attr('d', d3.area().x((p) => x(p.t)).y0((p) => y(byK.get(p.k))).y1((p) => y(p.v))(pts));
+  }
+  const line = d3.line().x((p) => x(p.t)).y((p) => y(p.v));
+  opt.series.forEach((s) => {
+    g.append('path').attr('fill', 'none').attr('stroke', s.color).attr('stroke-width', s.width || 2)
+      .attr('stroke-dasharray', s.dash === 'dot' ? '1.5 3' : s.dash ? '5 4' : null).attr('stroke-linecap', s.dash === 'dot' ? 'round' : null)
+      .attr('stroke-linejoin', 'round').attr('d', line(s.pts));
+    if (s.markers) s.pts.forEach((p) => g.append('circle').attr('cx', x(p.t)).attr('cy', y(p.v)).attr('r', 3.5)
+      .attr('fill', s.color).attr('stroke', css('--surface')).attr('stroke-width', 1.5));
+  });
+  endLabels(g, opt.series.filter((s) => !s.noLabel && s.pts.length).map((s) => {
+    const p = s.pts[s.pts.length - 1];
+    return { x: x(p.t) + 6, y: y(p.v), t: narrow || !s.short ? opt.fmt(p.v) : `${s.short}  ${opt.fmt(p.v)}` };
+  }), h);
+
+  // hover: for each series, its point nearest the pointer (if close enough for that series' frequency)
+  const hov = g.append('g').attr('pointer-events', 'none').style('display', 'none');
+  hov.append('line').attr('class', 'hover-rule').attr('y1', 0).attr('y2', h);
+  const dots = opt.series.map((s) => hov.append('circle').attr('r', 4).attr('fill', s.color).attr('stroke', css('--surface')).attr('stroke-width', 2));
+  const bis = d3.bisector((p) => p.t).center;
+  const onMove = (ev) => {
+    const [mx] = d3.pointer(ev, g.node());
+    const t = x.invert(Math.max(0, Math.min(w, mx)));
+    const hits = opt.series.map((s) => {
+      if (!s.pts.length) return null;
+      const p = s.pts[bis(s.pts, t)];
+      return Math.abs(p.t - t) / 864e5 <= TOL[s.freq] ? p : null;
+    });
+    const lead = hits.findIndex(Boolean);
+    if (lead < 0) { hov.style('display', 'none'); hideTip(); return; }
+    const head = opt.series[lead], hp = hits[lead];
+    hov.style('display', null);
+    hov.select('line').attr('x1', x(hp.t)).attr('x2', x(hp.t));
+    dots.forEach((d, i) => d.style('display', hits[i] ? null : 'none').attr('cx', hits[i] ? x(hits[i].t) : 0).attr('cy', hits[i] ? y(hits[i].v) : 0));
+    showTip(ev, `<div class="t">${dateLabel(head.freq, hp.k)}</div>` + opt.series.map((s, i) => {
+      if (!hits[i] || s.noTip) return '';
+      const other = s.freq !== head.freq ? dateLabel(s.freq, hits[i].k) : '';
+      return row(s.label, opt.fmt(hits[i].v), s.color, other);
+    }).join('') + (opt.tipExtra ? opt.tipExtra(hp) : ''));
+  };
+  g.append('rect').attr('width', w).attr('height', h).attr('fill', 'transparent')
+    .on('pointermove', onMove).on('pointerdown', onMove)
+    .on('pointerleave', (ev) => { if (ev.pointerType !== 'touch') { hov.style('display', 'none'); hideTip(); } });
+}
+
+// ---------- stacked area over time (layers share the same dates) ----------
+// opt: { t (ISO), freq, layers: [{ label, short, color, vals }] (bottom first), fmt, height, bands, events, totalLabel }
+function stackChart(id, opt) {
+  const el = $(id);
+  const narrow = el.clientWidth < 560;
+  const m = { t: 16, r: narrow ? 58 : (opt.labelW || 150), b: 24, l: 50 };
+  const { g, w, h } = frame(el, opt.height || 280, m);
+  const rows = opt.t.map((k, i) => { const r = { t: pd(k), k }; opt.layers.forEach((L, j) => { r[j] = L.vals[i] || 0; }); return r; });
+  const st = d3.stack().keys(opt.layers.map((_, j) => j))(rows);
+  const x = d3.scaleTime().domain(d3.extent(rows, (r) => r.t)).range([0, w]);
+  const y = d3.scaleLinear().domain([0, d3.max(st[st.length - 1], (d) => d[1]) * 1.05]).nice(5).range([h, 0]);
+  timeDecor(g, x, h, w, opt);
+  yAxis(g, y, w, opt.axisFmt || fk);
+  xAxis(g, x, h, w);
+  const area = d3.area().x((d) => x(d.data.t)).y0((d) => y(d[0])).y1((d) => y(d[1]));
+  st.forEach((layer, j) => g.append('path').attr('fill', opt.layers[j].color).attr('d', area(layer))
+    .attr('stroke', css('--surface')).attr('stroke-width', 1));
+  // timeDecor drew bands under the areas; redraw event lines on top so they stay visible
+  (opt.events || []).forEach((e) => { const xe = x(pd(e.t)); if (xe >= 0 && xe <= w) g.append('line').attr('class', 'brk').attr('x1', xe).attr('x2', xe).attr('y1', 0).attr('y2', h); });
+  const last = rows.length - 1;
+  endLabels(g, opt.layers.map((L, j) => ({
+    x: x(rows[last].t) + 6, y: y((st[j][last][0] + st[j][last][1]) / 2),
+    t: narrow ? fk(rows[last][j]) : `${L.short || L.label}  ${opt.fmt(rows[last][j])}`,
+  })).filter((e, j) => rows[last][j] > 0), h);
+
+  const hov = g.append('g').attr('pointer-events', 'none').style('display', 'none');
+  hov.append('line').attr('class', 'hover-rule').attr('y1', 0).attr('y2', h);
+  const bis = d3.bisector((r) => r.t).center;
+  const onMove = (ev) => {
+    const [mx] = d3.pointer(ev, g.node());
+    const i = bis(rows, x.invert(Math.max(0, Math.min(w, mx))));
+    const r = rows[i];
+    hov.style('display', null);
+    hov.select('line').attr('x1', x(r.t)).attr('x2', x(r.t));
+    const tot = d3.sum(opt.layers, (_, j) => r[j]);
+    showTip(ev, `<div class="t">${dateLabel(opt.freq, r.k)}</div>`
+      + opt.layers.map((L, j) => [L, j]).reverse().map(([L, j]) => row(L.label, opt.fmt(r[j]), L.color, tot ? fp(100 * r[j] / tot) : '')).join('')
+      + row(opt.totalLabel || 'Total', opt.fmt(tot)) + (opt.tipExtra ? opt.tipExtra(i) : ''));
+  };
+  g.append('rect').attr('width', w).attr('height', h).attr('fill', 'transparent')
+    .on('pointermove', onMove).on('pointerdown', onMove)
+    .on('pointerleave', (ev) => { if (ev.pointerType !== 'touch') { hov.style('display', 'none'); hideTip(); } });
+}
+
+// ---------- stacked bars by year ----------
+function barStack(id, opt) {
+  const el = $(id);
+  const m = { t: 34, r: 8, b: 24, l: 50 };
+  const { g, w, h } = frame(el, opt.height || 300, m);
+  const x = d3.scaleBand().domain(opt.cats).range([0, w]).padding(0.28);
+  const tot = opt.cats.map((_, i) => d3.sum(opt.layers, (L) => L.vals[i] || 0));
+  const y = d3.scaleLinear().domain([0, d3.max(tot)]).nice(5).range([h, 0]);
+  yAxis(g, y, w, fk);
+  g.append('g').attr('class', 'axis').attr('transform', `translate(0,${h})`)
+    .call(d3.axisBottom(x).tickSizeOuter(0).tickValues(w < 420 ? opt.cats.filter((_, i) => i % 2 === 0) : opt.cats));
+  opt.cats.forEach((c, i) => {
+    let acc = 0;
+    const bar = g.append('g');
+    opt.layers.forEach((L) => {
+      const v = L.vals[i] || 0;
+      if (!v) return;
+      bar.append('rect').attr('x', x(c)).attr('width', x.bandwidth()).attr('y', y(acc + v)).attr('height', Math.max(0, y(acc) - y(acc + v)))
+        .attr('fill', L.color).attr('stroke', css('--surface')).attr('stroke-width', 1.5);
+      acc += v;
+    });
+    if (opt.top && x.bandwidth() >= 30) g.append('text').attr('class', 'lbl').attr('x', x(c) + x.bandwidth() / 2).attr('y', y(tot[i]) - 6).attr('text-anchor', 'middle').text(opt.top(i));
+    const onMove = (ev) => showTip(ev, `<div class="t">${c}</div>` + [...opt.layers].reverse().filter((L) => L.vals[i]).map((L) => row(L.label, fmt(L.vals[i]), L.color)).join('')
+      + row('Total', fmt(tot[i])) + (opt.tipExtra ? opt.tipExtra(i) : ''));
+    g.append('rect').attr('x', x(c) - x.step() * x.paddingInner() / 2).attr('width', x.step()).attr('y', 0).attr('height', h).attr('fill', 'transparent')
+      .on('pointermove', onMove).on('pointerdown', onMove).on('pointerleave', (ev) => { if (ev.pointerType !== 'touch') hideTip(); });
+  });
+}
+
+// ---------- horizontal bars ----------
+// rows: [{ label, v, color, tip }]
+function hbars(id, rows, o = {}) {
+  const el = $(id);
+  const lw = Math.min(200, Math.max(70, d3.max(rows, (r) => r.label.length) * 6.6));
+  const rh = o.rowH || 34;
+  const m = { t: 4, r: 74, b: o.axis ? 22 : 4, l: lw };
+  const { g, w } = frame(el, rows.length * rh + m.t + m.b, m);
+  const x = d3.scaleLinear().domain([0, o.max || d3.max(rows, (r) => r.v)]).range([0, w]);
+  const y = d3.scaleBand().domain(rows.map((_, i) => i)).range([0, rows.length * rh]).padding(0.3);
+  if (o.axis) g.append('g').attr('class', 'axis').attr('transform', `translate(0,${rows.length * rh})`).call(d3.axisBottom(x).ticks(4).tickFormat(o.axisFmt || fk).tickSizeOuter(0));
+  rows.forEach((r, i) => {
+    g.append('text').attr('class', 'lbl').attr('x', -10).attr('y', y(i) + y.bandwidth() / 2 + 4).attr('text-anchor', 'end').text(r.label);
+    g.append('rect').attr('x', 0).attr('y', y(i)).attr('height', y.bandwidth()).attr('width', Math.max(1.5, x(r.v))).attr('rx', 3).attr('fill', r.color);
+    g.append('text').attr('class', 'lbl-strong').attr('x', x(r.v) + 6).attr('y', y(i) + y.bandwidth() / 2 + 4).text((o.fmt || fmt)(r.v));
+    const onMove = (ev) => showTip(ev, `<div class="t">${r.label}</div>` + row(o.what || 'Value', (o.fmt || fmt)(r.v)) + (r.tip || ''));
+    g.append('rect').attr('x', -lw).attr('y', y(i) - 4).attr('width', w + lw).attr('height', y.bandwidth() + 8).attr('fill', 'transparent')
+      .on('pointermove', onMove).on('pointerdown', onMove).on('pointerleave', (ev) => { if (ev.pointerType !== 'touch') hideTip(); });
+  });
+}
+
+// ---------- dumbbell: first vs latest per row ----------
+// o: { aLabel, bLabel, fmt (labels and axis; default compact counts), tipFmt, change(r) -> text, labelW, max }
+function dumbbell(id, rows, o) {
+  const el = $(id);
+  const narrow = el.clientWidth < 420;
+  const F = o.fmt || fk, TF = o.tipFmt || fmt;
+  const change = o.change || ((r) => { const ch = r.b / r.a - 1; return `${ch >= 0 ? '+' : ''}${Math.round(ch * 100)}%`; });
+  const rh = 26, m = { t: 6, r: narrow ? 64 : 120, b: 22, l: o.labelW || 78 };
+  const { g, w } = frame(el, rows.length * rh + m.t + m.b, m);
+  const x = d3.scaleLinear().domain([0, o.max || d3.max(rows, (r) => Math.max(r.a, r.b))]).nice(4).range([0, w]);
+  const H = rows.length * rh;
+  g.append('g').attr('class', 'gridlines').attr('transform', `translate(0,${H})`).call(d3.axisBottom(x).ticks(4).tickSize(-H).tickFormat(''));
+  g.append('g').attr('class', 'axis').attr('transform', `translate(0,${H})`).call(d3.axisBottom(x).ticks(4).tickFormat(F).tickSizeOuter(0));
+  rows.forEach((r, i) => {
+    const cy = i * rh + rh / 2;
+    g.append('text').attr('class', 'lbl').attr('x', -10).attr('y', cy + 4).attr('text-anchor', 'end').text(r.label);
+    g.append('line').attr('x1', x(r.a)).attr('x2', x(r.b)).attr('y1', cy).attr('y2', cy).attr('stroke', css('--neutral')).attr('stroke-width', 2);
+    g.append('circle').attr('cx', x(r.a)).attr('cy', cy).attr('r', 4.5).attr('fill', css('--muted')).attr('stroke', css('--surface')).attr('stroke-width', 1.5);
+    g.append('circle').attr('cx', x(r.b)).attr('cy', cy).attr('r', 5.5).attr('fill', css('--s1')).attr('stroke', css('--surface')).attr('stroke-width', 1.5);
+    g.append('text').attr('class', 'lbl').attr('x', x(Math.max(r.a, r.b)) + 9).attr('y', cy + 4)
+      .text(narrow ? F(r.b) : `${F(r.b)}  (${change(r)})`);
+    const onMove = (ev) => showTip(ev, `<div class="t">${r.label}</div>` + row(o.aLabel, TF(r.a), css('--muted')) + row(o.bLabel, TF(r.b), css('--s1'))
+      + row('Change', change(r)));
+    g.append('rect').attr('x', -m.l).attr('y', i * rh).attr('width', w + m.l + m.r).attr('height', rh).attr('fill', 'transparent')
+      .on('pointermove', onMove).on('pointerdown', onMove).on('pointerleave', (ev) => { if (ev.pointerType !== 'touch') hideTip(); });
+  });
+}
+
+// ---------- 100% segmented bars ----------
+// rows: [{ label, parts: [{ label, v, color, ink }], rate, bold, ruleAbove }]
+// o.rate: { title, color, fmt, note } adds a second column: one bar per row for r.rate, all on one scale
+// (the rate is a ratio between two segments, so it can't be a segment of the 100% bar itself)
+function seg100(id, rows, o = {}) {
+  const el = $(id);
+  const narrow = el.clientWidth < 460;
+  // phone: no room for two columns, so each row stacks name / 100% bar / rate bar, all full width
+  const stacked = narrow && o.rate && !o.noLabels;
+  const rh = stacked ? 66 : (o.rowH || 52);
+  const head = o.rate ? (stacked ? 36 : 22) : 0;
+  const m = { t: 4 + head, r: 4, b: 4, l: o.noLabels || stacked ? 0 : (o.labelW || 92) };
+  const { g, w: W } = frame(el, rows.length * rh + m.t + m.b, m);
+  const rateW = !o.rate ? 0 : stacked ? W : (o.rate.width || 200), gap = o.rate && !stacked ? 28 : 0;
+  const w = stacked ? W : W - rateW - gap; // width of the 100% bars
+  let rx = null, rateBarW = 0;
+  if (o.rate) {
+    const max = Math.max(10, Math.ceil(d3.max(rows, (r) => r.rate || 0) / 10) * 10);
+    rateBarW = rateW - 48;
+    rx = d3.scaleLinear().domain([0, max]).range([0, rateBarW]);
+    if (stacked) {
+      g.append('text').attr('class', 'lbl').attr('x', 0).attr('y', -22).text(`Wide bar: ${(o.mainTitle || 'share of the group').toLowerCase()}`);
+      g.append('text').attr('class', 'lbl').attr('x', 0).attr('y', -6).text(`Thin bar: ${o.rate.title.toLowerCase()} (scale 0–${max}%)`);
+    } else {
+      g.append('text').attr('class', 'lbl').attr('x', 0).attr('y', -10).text(o.mainTitle || 'Share of the group');
+      g.append('text').attr('class', 'lbl').attr('x', w + gap).attr('y', -10).text(`${o.rate.title} (scale 0–${max}%)`);
+    }
+  }
+  rows.forEach((r, i) => {
+    const tot = d3.sum(r.parts, (p) => p.v);
+    const x = d3.scaleLinear().domain([0, tot]).range([0, w]);
+    const y0 = stacked ? i * rh + 20 : i * rh + 6, bh = stacked ? 22 : rh - 12;
+    if (r.ruleAbove) g.append('line').attr('x1', -m.l).attr('x2', W + m.r).attr('y1', i * rh).attr('y2', i * rh).attr('stroke', css('--border'));
+    if (stacked) g.append('text').attr('class', r.bold ? 'lbl-strong' : 'lbl').attr('x', 0).attr('y', i * rh + 14).text(r.label);
+    else if (!o.noLabels) g.append('text').attr('class', r.bold ? 'lbl-strong' : 'lbl').attr('x', -10).attr('y', y0 + bh / 2 + 4).attr('text-anchor', 'end').text(r.label);
+    let acc = 0;
+    r.parts.forEach((p) => {
+      const x0 = x(acc), pw = x(acc + p.v) - x0;
+      g.append('rect').attr('x', x0 + 1).attr('y', y0).attr('width', Math.max(1, pw - 2)).attr('height', bh).attr('rx', 3).attr('fill', p.color);
+      const txt = `${(100 * p.v / tot).toFixed(1)}%`;
+      if (pw > txt.length * 7.2 + 10) g.append('text').attr('class', 'lbl-in').attr('x', x0 + pw / 2).attr('y', y0 + bh / 2 + 4)
+        .attr('text-anchor', 'middle').attr('fill', p.ink || '#fff').text(txt);
+      const onMove = (ev) => showTip(ev, `<div class="t">${r.label}</div>` + row(p.label, (o.valueFmt || fmt)(p.v), p.color, o.valueFmt ? '' : txt));
+      g.append('rect').attr('x', x0).attr('y', y0).attr('width', Math.max(1, pw)).attr('height', bh).attr('fill', 'transparent')
+        .on('pointermove', onMove).on('pointerdown', onMove).on('pointerleave', (ev) => { if (ev.pointerType !== 'touch') hideTip(); });
+      acc += p.v;
+    });
+    if (o.rate && r.rate != null) {
+      // track (the full scale), gridlines every 10 points, the bar, then the value
+      const x0 = stacked ? 0 : w + gap, th = stacked ? 11 : Math.min(bh, 18), ty = stacked ? y0 + bh + 5 : y0 + (bh - th) / 2;
+      g.append('rect').attr('x', x0).attr('y', ty).attr('width', rateBarW).attr('height', th).attr('rx', 3).attr('fill', css('--band'));
+      for (let t = 10; t < rx.domain()[1]; t += 10) g.append('line').attr('x1', x0 + rx(t)).attr('x2', x0 + rx(t))
+        .attr('y1', ty).attr('y2', ty + th).attr('stroke', css('--surface')).attr('stroke-width', 1.5);
+      g.append('rect').attr('x', x0).attr('y', ty).attr('width', Math.max(2, rx(r.rate))).attr('height', th).attr('rx', 3).attr('fill', o.rate.color);
+      g.append('text').attr('class', 'lbl-strong').attr('x', x0 + rx(r.rate) + 6).attr('y', ty + th / 2 + 4).text(o.rate.fmt(r.rate));
+      const onMove = (ev) => showTip(ev, `<div class="t">${r.label}</div>` + row(o.rate.title, o.rate.fmt(r.rate), o.rate.color)
+        + (o.rate.note ? `<div class="row"><span>${o.rate.note}</span></div>` : ''));
+      g.append('rect').attr('x', x0).attr('y', stacked ? ty - 2 : y0).attr('width', rateW).attr('height', stacked ? th + 4 : bh).attr('fill', 'transparent')
+        .on('pointermove', onMove).on('pointerdown', onMove).on('pointerleave', (ev) => { if (ev.pointerType !== 'touch') hideTip(); });
+    }
+  });
+}
+
+// ---------- data tables ----------
+function table(id, head, rows) {
+  $(id).innerHTML = `<table><thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>`
+    + rows.map((r) => `<tr>${r.map((c) => `<td>${c ?? '–'}</td>`).join('')}</tr>`).join('') + '</tbody></table>';
+}
+// one row per date (latest first), one column per series
+function tableSeries(id, series, f, firstHead = 'Date') {
+  const map = new Map();
+  series.forEach((s, j) => s.pts.forEach((p) => {
+    if (!map.has(p.k)) map.set(p.k, { label: dateLabel(s.freq, p.k), v: [] });
+    map.get(p.k).v[j] = p.v;
+  }));
+  const rows = [...map.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1)).map(([, r]) => [r.label, ...series.map((_, j) => (r.v[j] == null ? null : f(r.v[j])))]);
+  table(id, [firstHead, ...series.map((s) => s.label)], rows);
+}
+
+// ---------- state ----------
+const state = { rate: 'unempRate', rateG: 'nat', lev: 'employed', aff: 'scheme', pov: 'arope', pv: 'smooth', eusSex: 'all', eusTerr: 'pv',
+  cenView: 'cont', cenSex: 'all', cenYear: null, cenRegion: 0 };
+let CEN = null; // census.json (INE 67129), loaded after data.json
+
+// ---------- work status by country of birth (INE annual census, table 67129) ----------
+// the unemployment-rate column next to the 100% bars: red like the "Unemployed" segment
+const RATE_COL = (c) => ({ title: 'Unemployment rate', short: 'Unemp. rate', color: c.neu, fmt: fp,
+  note: 'Unemployed ÷ (in work + unemployed)' });
+const CONT_NAMES = [['europe', 'Europe'], ['africa', 'Africa'], ['americas', 'Americas'], ['asia', 'Asia / Oceania']];
+function cenValues(ri, si, ci, yi) {
+  const nC = CEN.countries.length, nY = CEN.years.length, nA = CEN.acts.length;
+  const base = ((si * nC + ci) * nY + yi) * nA;
+  const o = {};
+  CEN.acts.forEach((a, j) => { o[a] = CEN.regions[ri].v[base + j] || 0; });
+  o.inactive = o.pension + o.otherInactive + o.student;
+  o.total = o.employed + o.unemployed + o.inactive;
+  return o;
+}
+const addUp = (list) => list.reduce((acc, d) => { Object.keys(d).forEach((k) => { acc[k] = (acc[k] || 0) + d[k]; }); return acc; }, {});
+function cenRegionOptions() {
+  // the table lists each region right before its provinces; regions with one province would repeat it, so skip that one
+  const R = CEN.regions, opts = [];
+  R.forEach((r, i) => {
+    if (r.level === 'province') {
+      let j = i; while (j > 0 && R[j].level === 'province') j--; // parent region
+      let k = j + 1, n = 0; while (k < R.length && R[k].level === 'province') { n++; k++; }
+      if (n === 1) return;
+    }
+    opts.push(`<option value="${i}"${i === state.cenRegion ? ' selected' : ''}>${r.level === 'province' ? ' ' : ''}${niceName(r.name)}</option>`);
+  });
+  return opts.join('');
+}
+function renderCensus() {
+  if (!CEN) return;
+  const c = C();
+  const yi = state.cenYear == null ? CEN.years.length - 1 : state.cenYear;
+  const si = CEN.sexes.indexOf(state.cenSex), ri = state.cenRegion;
+  seg('#sw-cen-view', [['cont', 'Continents'], ['country', 'Countries']], state.cenView, (v) => { state.cenView = v; renderCensus(); });
+  seg('#sw-cen-sex', [['all', 'All'], ['men', 'Men'], ['women', 'Women']], state.cenSex, (v) => { state.cenSex = v; renderCensus(); });
+  seg('#sw-cen-year', CEN.years.map((y, i) => [String(i), String(y)]), String(yi), (v) => { state.cenYear = +v; renderCensus(); });
+  const sel = $('#sel-cen-region');
+  if (!sel.options.length) {
+    sel.innerHTML = cenRegionOptions();
+    sel.addEventListener('change', () => { state.cenRegion = +sel.value; renderCensus(); });
+  }
+  sel.value = String(ri);
+
+  const val = (ci) => cenValues(ri, si, ci, yi);
+  const spainIdx = CEN.countries.findIndex((x) => x.cont === 'spain');
+  const abroadIdx = CEN.countries.map((x, i) => (x.cont === 'spain' ? -1 : i)).filter((i) => i >= 0);
+  let groups = [
+    ['Born in Spain', val(spainIdx), { bold: true }],
+    ['Born abroad, all', addUp(abroadIdx.map(val)), { bold: true }],
+  ];
+  let hidden = 0;
+  const MIN = 1000;
+  if (state.cenView === 'cont') {
+    groups = groups.concat(CONT_NAMES.map(([k, label], j) => [label, addUp(abroadIdx.filter((i) => CEN.countries[i].cont === k).map(val)), j === 0 ? { ruleAbove: true } : {}]));
+  } else {
+    const rows = abroadIdx.map((i) => [CEN.countries[i].name, val(i), {}]).sort((a, b) => b[1].total - a[1].total);
+    const shown = rows.filter((r) => r[1].total >= MIN);
+    hidden = rows.length - shown.length;
+    if (shown.length) shown[0][2] = { ruleAbove: true };
+    groups = groups.concat(shown);
+  }
+  const R = CEN.regions[ri], sexName = { all: '', men: ', men', women: ', women' }[state.cenSex];
+  $('#cen-sub').textContent = `${niceName(R.name)}${sexName}, population aged 16+ on 1 January ${CEN.years[yi]}`
+    + (hidden ? `. ${hidden} group${hidden > 1 ? 's' : ''} with under ${fmt(MIN)} people not shown` : '');
+  const parts = (d) => [
+    { label: 'In work', v: d.employed, color: c.fx, ink: '#062623' },
+    { label: 'Unemployed', v: d.unemployed, color: c.neu },
+    { label: 'Inactive', v: d.inactive, color: c.neutral, ink: css('--fg') },
+  ];
+  const urs = (d) => (d.employed + d.unemployed ? fp(100 * d.unemployed / (d.employed + d.unemployed)) : '–');
+  legend('#lg-cen', parts({}).map((p) => ({ label: p.label, color: p.color, kind: 'box' })));
+  const urn = (d) => (d.employed + d.unemployed ? 100 * d.unemployed / (d.employed + d.unemployed) : null);
+  seg100('#c-cen', groups.filter(([, d]) => d.total > 0).map(([label, d, o]) => ({ label, parts: parts(d), rate: urn(d), ...o })),
+    { rowH: state.cenView === 'cont' ? 46 : 36, labelW: 132, mainTitle: 'Share of people aged 16+', rate: RATE_COL(c) });
+  table('#t-cen', ['Born in', 'People 16+', 'In work', 'Unemployed', 'Pensioners', 'Students', 'Other inactive', 'In work %', 'Unemployment rate'],
+    groups.map(([label, d]) => [label, fmt(d.total), fmt(d.employed), fmt(d.unemployed), fmt(d.pension), fmt(d.student), fmt(d.otherInactive),
+      d.total ? fp(100 * d.employed / d.total) : '–', urs(d)]));
+}
+
+// ======================================================================
+// SEPE 2025 report: affiliates by scheme and sex; contracts and occupations (data.json → snapshots.sepeReport)
+// ======================================================================
+// dark or light text, whichever reads on a given fill
+const inkOn = (col) => (d3.hsl(col).l > 0.62 ? '#191B1C' : '#FFFFFF');
+const fpMaybe = (v) => (v % 1 ? fp(v) : fp0(v));
+
+// two bars per row (a and b, same scale), e.g. foreign vs Spanish shares
+function groupedBars(id, rows, o) {
+  const el = $(id);
+  const narrow = el.clientWidth < 520;
+  const rh = narrow ? 46 : 34, m = { t: 4, r: 4, b: 4, l: narrow ? 0 : (o.labelW || 240) };
+  const { g, w: W } = frame(el, rows.length * rh + m.t + m.b, m);
+  const x = d3.scaleLinear().domain([0, d3.max(rows, (r) => Math.max(r.a, r.b))]).range([0, W - 52]);
+  rows.forEach((r, i) => {
+    const y0 = i * rh, top = narrow ? y0 + 16 : y0 + 4, bh = narrow ? 11 : 11;
+    if (narrow) g.append('text').attr('class', 'lbl').attr('x', 0).attr('y', y0 + 12).text(r.label);
+    else g.append('text').attr('class', 'lbl').attr('x', -10).attr('y', y0 + rh / 2 + 4).attr('text-anchor', 'end').text(r.label);
+    [[r.a, o.aColor], [r.b, o.bColor]].forEach(([v, col], j) => {
+      const y = top + j * (bh + 3);
+      g.append('rect').attr('x', 0).attr('y', y).attr('width', Math.max(1.5, x(v))).attr('height', bh).attr('rx', 2).attr('fill', col);
+      g.append('text').attr('class', j ? 'lbl' : 'lbl-strong').attr('x', x(v) + 5).attr('y', y + bh - 1).attr('font-size', 10.5).text(o.fmt(v));
+    });
+    const onMove = (ev) => showTip(ev, `<div class="t">${r.label}</div>` + row(o.aLabel, o.fmt(r.a), o.aColor) + row(o.bLabel, o.fmt(r.b), o.bColor));
+    g.append('rect').attr('x', -m.l).attr('y', y0).attr('width', W + m.l).attr('height', rh).attr('fill', 'transparent')
+      .on('pointermove', onMove).on('pointerdown', onMove).on('pointerleave', (ev) => { if (ev.pointerType !== 'touch') hideTip(); });
+  });
+}
+
+function renderSchemes() {
+  const R = D.snapshots.sepeReport;
+  if (!R) { $('#scheme-card').hidden = true; return; }
+  const c = C(), A = R.affil_scheme, tot = R.affil_total.foreign;
+  const men = c.fx, women = c.es;
+  const sexParts = (d) => [{ label: 'Men', v: d.men, color: men, ink: inkOn(men) }, { label: 'Women', v: d.women, color: women, ink: inkOn(women) }];
+  const SCH = [['general', 'General scheme'], ['self_employed', 'Self-employed'], ['agrarian', 'Agricultural (special)'],
+    ['domestic', 'Domestic work (special)'], ['sea', 'Sea workers']];
+  legend('#lg-sch', [{ label: 'Men', color: men, kind: 'box' }, { label: 'Women', color: women, kind: 'box' }]);
+  seg100('#c-sch', SCH.map(([k, l]) => ({ label: l, parts: sexParts(A[k]), rate: 100 * (A[k].men + A[k].women) / tot.count })),
+    { rowH: 44, labelW: 150, mainTitle: 'Men and women', rate: { title: 'Share of all', short: 'Share', color: css('--muted'), fmt: fp, width: 190, note: 'Share of all foreign affiliates' } });
+
+  const N = R.affil_nat_sex;
+  const natParts = (d) => [{ label: 'EU nationals', v: d.eu, color: c.eu, ink: inkOn(c.eu) }, { label: 'Non-EU nationals', v: d.neu, color: c.neu, ink: inkOn(c.neu) }];
+  legend('#lg-who-nat', natParts({}).map((p) => ({ label: p.label, color: p.color, kind: 'box' })));
+  seg100('#c-who-nat', [{ label: 'Men', parts: natParts(N.men) }, { label: 'Women', parts: natParts(N.women) }], { rowH: 36, labelW: 70 });
+
+  const P = R.affil_dependency, selfCol = css('--seq4');
+  const depParts = (d) => [{ label: 'Employees', v: d.employee, color: c.neutral, ink: inkOn(c.neutral) }, { label: 'Self-employed', v: d.self_employed, color: selfCol, ink: inkOn(selfCol) }];
+  legend('#lg-who-dep', depParts({}).map((p) => ({ label: p.label, color: p.color, kind: 'box' })));
+  seg100('#c-who-dep', [{ label: 'Men', parts: depParts(P.men) }, { label: 'Women', parts: depParts(P.women) }], { rowH: 36, labelW: 70 });
+
+  const G = R.affil_age_pct.all, ages = [['under25', 'Under 25', '--seq1'], ['25to44', '25 to 44', '--seq3'], ['45plus', '45 and over', '--seq5']];
+  const ageParts = ages.map(([k, l, col]) => ({ label: l, v: G[k], color: css(col), ink: inkOn(css(col)) }));
+  legend('#lg-who-age', ageParts.map((p) => ({ label: p.label, color: p.color, kind: 'box' })));
+  seg100('#c-who-age', [{ label: 'All', parts: ageParts }], { rowH: 36, labelW: 70, valueFmt: fp });
+
+  const RG = R.rg_contract;
+  const RGL = [['permanent', 'Permanent'], ['temporary', 'Temporary'], ['full_time', 'Full time'], ['part_time', 'Part time'],
+    ['fixed_discontinuous', 'Fixed-discontinuous (seasonal)'], ['other', 'Other (no contract, cooperatives, trainees)']];
+  twoColBars('#c-rgc', RGL.map(([k, l]) => ({ key: k, label: l, a: RG[k].count, b: RG[k].share_pct })), {
+    aTitle: 'Foreign affiliates', bTitle: 'Foreign share', aColor: c.fx, bColor: c.fx,
+    aFmt: fk, bFmt: fp, bRef: tot.share_pct, labelW: 270,
+    tip: (r) => `<div class="t">${r.label}</div>` + row('Foreign affiliates', fmt(r.a), c.fx) + row('Foreign share', fp(r.b))
+      + row('Foreign share, all affiliates', fp(tot.share_pct)) + row('Change on 2024', `${RG[r.key].change_pct > 0 ? '+' : ''}${fp(RG[r.key].change_pct)}`),
+  });
+  const mT = d3.sum(Object.values(A), (d) => d.men), wT = d3.sum(Object.values(A), (d) => d.women);
+  $('#sch-note').textContent = `${fp(100 * mT / (mT + wT))} of foreign affiliates are men. Women are ${fp(100 * A.domestic.women / (A.domestic.men + A.domestic.women))} of the domestic-work scheme, `
+    + `men ${fp(100 * A.agrarian.men / (A.agrarian.men + A.agrarian.women))} of the agricultural one. Foreign nationals are ${fp(tot.share_pct)} of all affiliates (the dark mark), but `
+    + `${fp(RG.fixed_discontinuous.share_pct)} of those on fixed-discontinuous and ${fp(RG.part_time.share_pct)} of those on part-time contracts. The coal-mining scheme (${A.coal.men + A.coal.women} people) is in the table only.`;
+  table('#t-sch', ['Scheme', 'Men', 'Women', 'Total', 'Women %', 'Share of foreign affiliates'],
+    [...SCH, ['coal', 'Coal mining']].map(([k, l]) => { const t = A[k].men + A[k].women; return [l, fmt(A[k].men), fmt(A[k].women), fmt(t), t ? fp(100 * A[k].women / t) : '–', fp(100 * t / tot.count)]; })
+      .concat([['All (sex recorded)', fmt(mT), fmt(wT), fmt(mT + wT), fp(100 * wT / (mT + wT)), ''], ['Sex not recorded', '', '', fmt(tot.sex_unknown), '', '']]));
+}
+
+const OCC_NAMES = {
+  farm_labourers: 'Farm labourers (field crops)', waiters: 'Waiters', manufacturing_labourers: 'Manufacturing labourers',
+  cleaners: 'Cleaners (offices, hotels…)', greenhouse_labourers: 'Farm labourers (greenhouses, nurseries, gardens)',
+  shop_sales: 'Shop sales staff', kitchen_assistants: 'Kitchen assistants', freight_labourers: 'Freight handlers and loaders',
+  domestic_workers: 'Domestic workers', cooks: 'Cooks', recreation_monitors: 'Recreation and sports monitors',
+  customer_service_clerks: 'Customer service clerks',
+};
+const OCC_GROUPS = ['Managers', 'Professionals', 'Technicians and associate professionals', 'Clerical support workers',
+  'Service and sales workers', 'Skilled farm, forestry, fishing workers', 'Craft and related trades', 'Plant and machine operators',
+  'Elementary occupations'];
+
+function renderContracts() {
+  const R = D.snapshots.sepeReport;
+  if (!R) { $('#contracts').hidden = true; return; }
+  const c = C(), T = R.contracts_total.all;
+  // top occupations for foreign nationals, with their share of each occupation's contracts
+  const occ = Object.entries(R.occ_top).filter(([, d]) => d.foreign != null)
+    .map(([k, d]) => ({ key: k, label: OCC_NAMES[k] || k, a: d.foreign, es: d.spanish,
+      b: d.foreign_share_pct ?? 100 * d.foreign / (d.foreign + d.spanish) }))
+    .sort((p, q) => q.a - p.a);
+  twoColBars('#c-occ', occ, {
+    aTitle: 'Contracts signed by foreign nationals', bTitle: 'Foreign share', aColor: c.fx, bColor: c.fx,
+    aFmt: fk, bFmt: fp, bRef: T.foreign_share_pct, labelW: 300,
+    tip: (r) => `<div class="t">${r.label}</div>` + row('Contracts, foreign nationals', fmt(r.a), c.fx)
+      + row('Contracts, Spanish nationals', r.es == null ? 'not in the Spanish top 10' : fmt(r.es))
+      + row('Foreign share', fp(r.b)) + row("Share of all foreign nationals' contracts", fp(100 * r.a / T.foreign)),
+  });
+  const top3 = d3.sum(occ.slice(0, 3), (r) => r.a);
+  $('#occ-note').textContent = `The top three occupations alone are ${fp(100 * top3 / T.foreign)} of all contracts signed by foreign nationals. `
+    + `Foreign nationals signed ${fp(T.foreign_share_pct)} of all contracts in 2025 (the dark mark), but most of those in farm labouring and domestic work. `
+    + 'Shares are foreign ÷ (foreign + Spanish) contracts; for greenhouse labourers and domestic workers, which are not in the Spanish top 10, they are the report\'s own figures.';
+  table('#t-occ', ['Occupation', 'Foreign nationals', "% of foreign nationals' contracts", 'Spanish nationals', 'Foreign share'],
+    occ.map((r) => [r.label, fmt(r.a), fp(100 * r.a / T.foreign), r.es == null ? '–' : fmt(r.es), fp(r.b)])
+      .concat(Object.entries(R.occ_top).filter(([, d]) => d.foreign == null)
+        .map(([k, d]) => [`${OCC_NAMES[k] || k} (Spanish top 10 only)`, '–', '–', fmt(d.spanish), '–'])));
+
+  // broad occupational groups
+  const grp = OCC_GROUPS.map((l, i) => ({ label: `${i + 1} ${l}`, a: R.occ_group_pct[String(i + 1)].foreign, b: R.occ_group_pct[String(i + 1)].spanish }));
+  legend('#lg-grp', [{ label: 'Foreign nationals', color: c.fx, kind: 'box' }, { label: 'Spanish nationals', color: c.es, kind: 'box' }]);
+  groupedBars('#c-grp', grp, { aLabel: 'Foreign nationals', bLabel: 'Spanish nationals', aColor: c.fx, bColor: c.es, fmt: fp, labelW: 250 });
+  table('#t-grp', ['Group', 'Foreign nationals', 'Spanish nationals'], grp.map((r) => [r.label, fp(r.a), fp(r.b)]));
+
+  // type of contract
+  const CT = R.contracts_type, ft = css('--seq4'), pt = css('--seq2');
+  const tParts = (d) => [{ label: 'Full time', v: d.full_time, color: ft, ink: inkOn(ft) }, { label: 'Part time', v: d.part_time, color: pt, ink: inkOn(pt) },
+    { label: 'Fixed-discontinuous', v: d.fixed_discontinuous, color: c.eu, ink: inkOn(c.eu) }].filter((p) => p.v > 0);
+  const all = { full_time: CT.permanent.full_time + CT.temporary.full_time, part_time: CT.permanent.part_time + CT.temporary.part_time,
+    fixed_discontinuous: CT.permanent.fixed_discontinuous };
+  legend('#lg-ctype', tParts(all).map((p) => ({ label: p.label, color: p.color, kind: 'box' })));
+  seg100('#c-ctype', [
+    { label: 'All contracts', parts: tParts(all), rate: T.foreign_share_pct, bold: true },
+    { label: 'Permanent', parts: tParts(CT.permanent), rate: CT.permanent.foreign_share_pct, ruleAbove: true },
+    { label: 'Temporary', parts: tParts(CT.temporary), rate: CT.temporary.foreign_share_pct },
+  ], { rowH: 44, labelW: 104, mainTitle: "Foreign nationals' contracts", rate: { title: 'Foreign share', short: 'Foreign share', color: c.fx, fmt: fp, note: 'Foreign nationals\' share of all such contracts' } });
+
+  const TR = R.contracts_trend;
+  legend('#lg-ctrend', [{ label: '2016', color: css('--muted'), kind: 'box' }, { label: '2025', color: c.fx, kind: 'box' }]);
+  dumbbell('#c-ctrend', [['temporary_rate_men', 'Temporary, men'], ['temporary_rate_women', 'Temporary, women'],
+    ['part_time_rate_men', 'Part time, men'], ['part_time_rate_women', 'Part time, women']]
+    .map(([k, l]) => ({ label: l, a: TR[k]['2016'], b: TR[k]['2025'] })), {
+    aLabel: '2016', bLabel: '2025', fmt: fpMaybe, tipFmt: fp, max: 100, labelW: 116,
+    change: (r) => `${r.b - r.a > 0 ? '+' : ''}${(r.b - r.a).toFixed(1)} pts`,
+  });
+  const permTot = CT.permanent.full_time + CT.permanent.part_time + CT.permanent.fixed_discontinuous;
+  table('#t-ctype', ['', 'Full time', 'Part time', 'Fixed-discontinuous', 'Total', 'Foreign share of all such contracts', 'Change on 2024'],
+    [['Permanent', CT.permanent], ['Temporary', CT.temporary]].map(([l, d]) => [l, fmt(d.full_time), fmt(d.part_time), fmt(d.fixed_discontinuous),
+      fmt(d.full_time + d.part_time + d.fixed_discontinuous), fp(d.foreign_share_pct), `+${fp(d.change_pct)}`])
+      .concat([['All', fmt(all.full_time), fmt(all.part_time), fmt(all.fixed_discontinuous), fmt(T.foreign), fp(T.foreign_share_pct), '']],
+        [['Permanent share of foreign contracts', '', '', '', fp(100 * permTot / T.foreign), '', '']]));
+}
+
+// ======================================================================
+// Maps and sectors (regional.json + provinces.geo.json, loaded after census.json)
+// ======================================================================
+let REG = null, GEO = null;
+const CANARIAS = ['35', '38'];
+// INE names put the article last ("Rioja, La"); show them the usual way round
+function niceName(n) {
+  let m = n.match(/^(.*), (Comunidad Foral de|Comunidad de|Principado de|Región de)$/);
+  if (m) return m[1];
+  m = n.match(/^(.*), (El|La|Las|Los|A|O|Illes|L')$/);
+  return m ? `${m[2]}${m[2].endsWith("'") ? '' : ' '}${m[1]}` : n;
+}
+// province code -> { name, region code (CAxx), region name }, from the census region list (provinces follow their region)
+let PROV = null;
+function provinces() {
+  if (PROV) return PROV;
+  PROV = new Map();
+  let cur = null;
+  CEN.regions.forEach((r) => {
+    if (r.level === 'region') cur = r;
+    else if (r.level === 'province') PROV.set(r.code, { name: niceName(r.name), region: cur.code, regionName: niceName(cur.name) });
+  });
+  return PROV;
+}
+const cenIndex = (code) => CEN.regions.findIndex((r) => r.code === code);
+
+// ---------- choropleth of Spain's provinces (same layout as the Nacimientos map) ----------
+// o: { value(code) -> number|null, color(v), legend: { domain, fmt, title }, tip(code) -> html, onClick(code), group(code) -> key for hover }
+function drawMap(id, o) {
+  const el = $(id);
+  if (!GEO) { el.innerHTML = `<div class="empty">${GEO === false ? 'Could not load the map. The table below has the same figures.' : 'Loading map…'}</div>`; return; }
+  const W = el.clientWidth;
+  const H = Math.round(Math.max(320, Math.min(540, W * 0.62)));
+  const { svg, g } = frame(el, H, { t: 0, r: 0, b: 0, l: 0 });
+  svg.attr('aria-label', o.legend.title);
+  const main = { type: 'FeatureCollection', features: GEO.features.filter((f) => !CANARIAS.includes(f.id)) };
+  const can = { type: 'FeatureCollection', features: GEO.features.filter((f) => CANARIAS.includes(f.id)) };
+  const legendH = o.legend.noData ? 66 : 52, pad = 8, wide = W >= 640;
+  const iw = Math.min(W * (wide ? 0.24 : 0.5), 250), ih = iw * 0.42, ix = pad, iy = H - legendH - ih - 4;
+  const projMain = d3.geoConicConformal().parallels([37, 43]).rotate([3.7, 0])
+    .fitExtent(wide ? [[ix + iw + 12, pad], [W - pad, H - legendH]] : [[pad, pad], [W - pad, iy - 8]], main);
+  const projCan = d3.geoConicConformal().parallels([27, 29]).rotate([15.5, 0]).fitExtent([[ix + 6, iy + 6], [ix + iw - 6, iy + ih - 6]], can);
+  const pM = d3.geoPath(projMain), pC = d3.geoPath(projCan);
+  const pathOf = (f) => (CANARIAS.includes(f.id) ? pC : pM)(f);
+  g.append('rect').attr('x', ix).attr('y', iy).attr('width', iw).attr('height', ih).attr('rx', 6)
+    .attr('fill', 'none').attr('stroke', css('--axis')).attr('stroke-dasharray', '3 3');
+  g.append('text').attr('class', 'lbl').attr('x', ix + 8).attr('y', iy + 14).text('Canarias');
+
+  const fill = (c) => { const v = o.value(c); return v == null || !Number.isFinite(v) ? css('--grid') : o.color(v); };
+  const groupOf = o.group || ((c) => c);
+  const areas = g.append('g');
+  const hover = g.append('g').attr('pointer-events', 'none');
+  const show = (ev, f) => {
+    hover.selectAll('*').remove();
+    GEO.features.filter((x) => groupOf(x.id) === groupOf(f.id)).forEach((x) => hover.append('path').attr('d', pathOf(x))
+      .attr('fill', 'none').attr('stroke', css('--fg')).attr('stroke-width', 1.5).attr('stroke-linejoin', 'round'));
+    showTip(ev, o.tip(f.id) + (o.onClick ? '<div style="color:var(--muted);margin-top:4px">Click to open in the chart</div>' : ''));
+  };
+  const leave = (ev) => { if (ev.pointerType !== 'touch') { hover.selectAll('*').remove(); hideTip(); } };
+  areas.selectAll(null).data(GEO.features).join('path')
+    .attr('d', pathOf).attr('fill', (f) => fill(f.id)).attr('stroke', css('--surface')).attr('stroke-width', 0.75)
+    .style('cursor', o.onClick ? 'pointer' : null)
+    .on('pointermove', show).on('pointerdown', show).on('pointerleave', leave)
+    .on('click', (ev, f) => o.onClick && o.onClick(f.id));
+  // region borders a bit stronger, when provinces are coloured by region
+  if (o.group) {
+    const seen = new Set();
+    GEO.features.forEach((f) => {
+      const k = groupOf(f.id);
+      if (seen.has(k)) return; seen.add(k);
+      const members = GEO.features.filter((x) => groupOf(x.id) === k);
+      members.forEach((x) => areas.append('path').attr('d', pathOf(x)).attr('fill', 'none').attr('stroke', css('--surface')).attr('stroke-width', 0.25).attr('pointer-events', 'none'));
+    });
+  }
+  // Ceuta and Melilla are a few pixels wide: add a dot so they can be seen and hovered
+  areas.selectAll(null).data(GEO.features.filter((f) => f.id === '51' || f.id === '52')).join('circle')
+    .attr('cx', (f) => pM.centroid(f)[0]).attr('cy', (f) => pM.centroid(f)[1]).attr('r', 5)
+    .attr('fill', (f) => fill(f.id)).attr('stroke', css('--fg-2')).attr('stroke-width', 0.75)
+    .style('cursor', o.onClick ? 'pointer' : null)
+    .on('pointermove', show).on('pointerdown', show).on('pointerleave', leave).on('click', (ev, f) => o.onClick && o.onClick(f.id));
+
+  // legend: a colour bar with ticks, bottom right; grey swatch for "not shown"
+  const L = o.legend, lw = Math.min(280, W * (wide ? 0.4 : 0.62)), lx = W - lw - pad - 4, ly = H - legendH + 22;
+  const gid = `grad-${id.slice(1)}`;
+  const grad = svg.append('defs').append('linearGradient').attr('id', gid);
+  const [d0, d1] = [L.domain[0], L.domain[L.domain.length - 1]];
+  d3.range(0, 1.0001, 0.1).forEach((t) => grad.append('stop').attr('offset', `${t * 100}%`).attr('stop-color', o.color(d0 + t * (d1 - d0))));
+  g.append('text').attr('class', 'lbl').attr('x', lx).attr('y', ly - 8).text(L.title);
+  g.append('rect').attr('x', lx).attr('y', ly).attr('width', lw).attr('height', 10).attr('rx', 2).attr('fill', `url(#${gid})`);
+  const lxs = d3.scaleLinear().domain([d0, d1]).range([lx, lx + lw]);
+  lxs.ticks(4).forEach((t) => {
+    g.append('line').attr('x1', lxs(t)).attr('x2', lxs(t)).attr('y1', ly + 10).attr('y2', ly + 14).attr('stroke', css('--axis'));
+    g.append('text').attr('class', 'lbl').attr('x', lxs(t)).attr('y', ly + 26).attr('text-anchor', 'middle').text(L.fmt(t));
+  });
+  if (L.noData) { // grey swatch under the ticks
+    g.append('rect').attr('x', lx).attr('y', ly + 33).attr('width', 12).attr('height', 10).attr('rx', 2).attr('fill', css('--grid'));
+    g.append('text').attr('class', 'lbl').attr('x', lx + 17).attr('y', ly + 42).text(`Not coloured: ${L.noData}`);
+  }
+}
+const seqColor = (domain) => d3.scaleSequential(domain, d3.interpolateRgbBasis(['--seq0', '--seq1', '--seq2', '--seq3', '--seq4', '--seq5'].map(css)));
+// gap maps: neutral grey at 0, teal where foreign nationals are higher, violet where Spanish nationals are
+const divColor = (lo, hi) => {
+  const m = Math.max(Math.abs(lo), Math.abs(hi)) || 1;
+  return d3.scaleDiverging([-m, 0, m], d3.interpolateRgbBasis([css('--s2'), css('--neutral'), css('--s1')]));
+};
+
+// ---------- province map (census) ----------
+Object.assign(state, { pmMetric: 'share', pmGroup: 'fxnat', pmSex: 'all', pmYear: null });
+const PM_MIN = 300;
+function pmGroups() {
+  const opts = [['fxnat', 'Foreign nationals'], ['abroad', 'Born abroad, all']];
+  CONT_NAMES.forEach(([k, l]) => opts.push([`cont:${k}`, `Born in ${l === 'Europe' ? 'Europe (outside Spain)' : l}`]));
+  CEN.countries.forEach((c, i) => { if (c.cont !== 'spain') opts.push([`ctry:${i}`, `Born in ${c.name}`]); });
+  return opts;
+}
+function natValues(ri, si, which, yi) { // censusNat: [sex][es, fx][year][acts]
+  const N = REG.censusNat, nY = N.years.length, nA = N.acts.length;
+  const base = ((si * 2 + (which === 'es' ? 0 : 1)) * nY + yi) * nA, o = {};
+  N.acts.forEach((a, j) => { o[a] = N.regions[ri].v[base + j]; });
+  o.inactive = o.pension + o.otherInactive + o.student;
+  o.total = o.employed + o.unemployed + o.inactive;
+  return o;
+}
+function renderProvMap() {
+  if (!CEN || !REG || !REG.censusNat) return;
+  const c = C();
+  const yi = state.pmYear == null ? CEN.years.length - 1 : state.pmYear, si = CEN.sexes.indexOf(state.pmSex);
+  const METRIC = { share: 'Share of adults', unemp: 'Unemployment rate', work: 'In work' };
+  seg('#sw-pm-metric', Object.entries(METRIC), state.pmMetric, (v) => { state.pmMetric = v; renderProvMap(); });
+  seg('#sw-pm-sex', [['all', 'All'], ['men', 'Men'], ['women', 'Women']], state.pmSex, (v) => { state.pmSex = v; renderProvMap(); });
+  seg('#sw-pm-year', CEN.years.map((y, i) => [String(i), String(y)]), String(yi), (v) => { state.pmYear = +v; renderProvMap(); });
+  const sel = $('#sel-pm-group');
+  if (!sel.options.length) {
+    sel.innerHTML = pmGroups().map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+    sel.addEventListener('change', () => { state.pmGroup = sel.value; renderProvMap(); });
+  }
+  sel.value = state.pmGroup;
+  const groupLabel = sel.options[sel.selectedIndex].text;
+  const isNat = state.pmGroup === 'fxnat';
+  const natIdx = new Map(REG.censusNat.regions.map((r, i) => [r.code, i]));
+  const spainIdx = CEN.countries.findIndex((x) => x.cont === 'spain');
+  const members = (() => {
+    const g = state.pmGroup, all = CEN.countries.map((_, i) => i).filter((i) => i !== spainIdx);
+    if (g === 'abroad') return all;
+    if (g.startsWith('cont:')) return all.filter((i) => CEN.countries[i].cont === g.slice(5));
+    if (g.startsWith('ctry:')) return [+g.slice(5)];
+    return null;
+  })();
+  // per province: the group, the comparison group (Spanish nationals / born in Spain) and everyone
+  const P = provinces(), rows = new Map();
+  P.forEach((p, code) => {
+    let grp, ref, all;
+    if (isNat) {
+      const ri = natIdx.get(code);
+      grp = natValues(ri, si, 'fx', yi); ref = natValues(ri, si, 'es', yi); all = addUp([grp, ref]);
+    } else {
+      const ri = cenIndex(code), v = (i) => cenValues(ri, si, i, yi);
+      grp = addUp(members.map(v)); ref = v(spainIdx); all = addUp(CEN.countries.map((_, i) => v(i)));
+    }
+    rows.set(code, { p, grp, ref, all });
+  });
+  const ur = (d) => (d.employed + d.unemployed ? 100 * d.unemployed / (d.employed + d.unemployed) : null);
+  const wr = (d) => (d.total ? 100 * d.employed / d.total : null);
+  const metric = {
+    share: (r) => 100 * r.grp.total / r.all.total,
+    unemp: (r) => (r.grp.total >= PM_MIN ? ur(r.grp) : null),
+    work: (r) => (r.grp.total >= PM_MIN ? wr(r.grp) : null),
+  }[state.pmMetric];
+  const refName = isNat ? 'Spanish nationals' : 'Born in Spain';
+  const vals = [...rows.values()].map(metric).filter((v) => v != null);
+  const color = seqColor(d3.extent(vals));
+  const sexName = { all: '', men: ', men', women: ', women' }[state.pmSex];
+  $('#pm-title').textContent = `By province: ${METRIC[state.pmMetric].toLowerCase()}, ${groupLabel[0].toLowerCase()}${groupLabel.slice(1)}`;
+  $('#pm-sub').textContent = `People aged 16+ on 1 January ${CEN.years[yi]}${sexName}. `
+    + { share: `${groupLabel} as a share of all adults in each province`, unemp: 'Unemployed ÷ (in work + unemployed)', work: 'In work as a share of all adults in the group' }[state.pmMetric];
+  drawMap('#c-pm', {
+    value: (code) => (rows.has(code) ? metric(rows.get(code)) : null),
+    color,
+    legend: { domain: d3.extent(vals), fmt: fp0, title: METRIC[state.pmMetric], noData: state.pmMetric === 'share' ? null : `under ${PM_MIN} people` },
+    tip: (code) => {
+      const r = rows.get(code); if (!r) return '';
+      const v = metric(r);
+      return `<div class="t">${r.p.name}</div>` + row(METRIC[state.pmMetric], v == null ? `– (under ${PM_MIN} people)` : fp(v), color(v ?? 0))
+        + row(`${groupLabel}, 16+`, fmt(r.grp.total)) + (state.pmMetric === 'share' ? '' : row('Share of adults', fp(100 * r.grp.total / r.all.total)))
+        + (state.pmMetric === 'unemp' ? row(`${refName}: unemployment`, fp(ur(r.ref))) : '')
+        + (state.pmMetric === 'work' ? row(`${refName}: in work`, fp(wr(r.ref))) : '')
+        + row('Region', r.p.regionName);
+    },
+    onClick: (code) => {
+      const i = cenIndex(code); if (i < 0) return;
+      state.cenRegion = i; renderCensus(); hideTip();
+      $('#census-card').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    },
+  });
+  const list = [...rows.values()].sort((a, b) => (metric(b) ?? -1) - (metric(a) ?? -1));
+  table('#t-pm', ['Province', 'Region', `${groupLabel}, 16+`, 'Share of adults', 'Unemployment rate', 'In work %', `${refName}: unemployment`],
+    list.map((r) => [r.p.name, r.p.regionName, fmt(r.grp.total), fp(100 * r.grp.total / r.all.total),
+      r.grp.total >= PM_MIN && ur(r.grp) != null ? fp(ur(r.grp)) : '–', r.grp.total >= PM_MIN && wr(r.grp) != null ? fp(wr(r.grp)) : '–', ur(r.ref) == null ? '–' : fp(ur(r.ref))]));
+}
+
+// ---------- region map (EPA annual averages) ----------
+Object.assign(state, { rmMetric: 'unemp', rmGroup: 'fx', rmSex: 'all', rmYear: null });
+const RM_MIN = 5; // thousand people: INE's caution threshold for EPA estimates
+function epaValues(ri, si, nat, yi) { // epa: [sex][nat][year][pop16, active, employed], thousands
+  const E = REG.epa, nN = E.nats.length, nY = E.years.length;
+  const b = ((si * nN + E.nats.indexOf(nat)) * nY + yi) * 3, v = E.regions[ri].v;
+  return { pop16: v[b], active: v[b + 1], employed: v[b + 2] };
+}
+function renderRegMap() {
+  if (!CEN || !REG || !REG.epa) return;
+  const E = REG.epa;
+  const yi = state.rmYear == null ? E.years.length - 1 : state.rmYear, si = E.sexes.indexOf(state.rmSex);
+  const METRIC = { unemp: 'Unemployment rate', act: 'Activity rate', emp: 'Employment rate' };
+  const GROUP = { fx: 'Foreign', eu: 'EU', neu: 'Non-EU', es: 'Spanish', gap: 'Gap: foreign − Spanish' };
+  seg('#sw-rm-metric', Object.entries(METRIC), state.rmMetric, (v) => { state.rmMetric = v; renderRegMap(); });
+  seg('#sw-rm-group', Object.entries(GROUP), state.rmGroup, (v) => { state.rmGroup = v; renderRegMap(); });
+  seg('#sw-rm-sex', [['all', 'All'], ['men', 'Men'], ['women', 'Women']], state.rmSex, (v) => { state.rmSex = v; renderRegMap(); });
+  const sel = $('#sel-rm-year');
+  if (!sel.options.length) {
+    sel.innerHTML = E.years.map((y, i) => [y, i]).reverse().map(([y, i]) => `<option value="${i}">${y}</option>`).join('');
+    sel.addEventListener('change', () => { state.rmYear = +sel.value; renderRegMap(); });
+  }
+  sel.value = String(yi);
+  // rate from levels; null when the base is under the caution threshold
+  const rate = (d) => {
+    if (!d || d.pop16 == null || d.active == null || d.employed == null) return null;
+    if (state.rmMetric === 'unemp') return d.active >= RM_MIN ? 100 * (d.active - d.employed) / d.active : null;
+    if (d.pop16 < RM_MIN) return null;
+    return 100 * (state.rmMetric === 'act' ? d.active : d.employed) / d.pop16;
+  };
+  const regIdx = new Map(E.regions.map((r, i) => [r.code, i]));
+  const at = (code, nat) => rate(epaValues(regIdx.get(code), si, nat, yi));
+  const value = (code) => {
+    if (state.rmGroup !== 'gap') return at(code, state.rmGroup);
+    const a = at(code, 'fx'), b = at(code, 'es');
+    return a == null || b == null ? null : a - b;
+  };
+  const P = provinces();
+  const regCodes = E.regions.map((r) => r.code).filter((c) => c !== 'CA00');
+  const vals = regCodes.map(value).filter((v) => v != null);
+  const gap = state.rmGroup === 'gap';
+  const color = gap ? divColor(...d3.extent(vals)) : seqColor(d3.extent(vals));
+  const fpts = (v) => `${v > 0 ? '+' : ''}${v.toFixed(1)} pts`;
+  const show = gap ? fpts : fp;
+  const nat = { all: '', men: ', men', women: ', women' }[state.rmSex];
+  $('#rm-title').textContent = `By region: ${METRIC[state.rmMetric].toLowerCase()}, ${gap ? 'foreign minus Spanish nationals' : `${GROUP[state.rmGroup].toLowerCase()} nationals`}`;
+  const spain = (n) => rate(epaValues(regIdx.get('CA00'), si, n, yi));
+  $('#rm-sub').textContent = `EPA, ${E.years[yi]} annual average${nat}. Spain: foreign ${spain('fx') == null ? '–' : fp(spain('fx'))}, Spanish ${spain('es') == null ? '–' : fp(spain('es'))}`
+    + (gap ? '. Teal: higher for foreign nationals; violet: higher for Spanish nationals' : '');
+  const name = (code) => niceName(E.regions[regIdx.get(code)].name);
+  drawMap('#c-rm', {
+    value: (pcode) => (P.has(pcode) ? value(P.get(pcode).region) : null),
+    group: (pcode) => (P.has(pcode) ? P.get(pcode).region : pcode),
+    color,
+    legend: { domain: gap ? color.domain().filter((_, i) => i !== 1) : d3.extent(vals), fmt: gap ? (v) => `${v > 0 ? '+' : ''}${Math.round(v)}` : fp0,
+      title: gap ? `${METRIC[state.rmMetric]}: gap in points` : METRIC[state.rmMetric], noData: 'too few in the sample' },
+    tip: (pcode) => {
+      if (!P.has(pcode)) return '';
+      const rc = P.get(pcode).region, d = epaValues(regIdx.get(rc), si, 'fx', yi), v = value(rc);
+      return `<div class="t">${name(rc)}</div>` + (gap ? row('Gap', v == null ? '–' : fpts(v)) : '')
+        + ['fx', 'eu', 'neu', 'es'].map((n) => row(`${GROUP[n]} nationals`, at(rc, n) == null ? '– (small sample)' : fp(at(rc, n)), n === state.rmGroup ? color(v ?? 0) : null)).join('')
+        + row('Foreign nationals 16+ (estimate)', d.pop16 == null ? '–' : `${fmt(Math.round(d.pop16 * 1000))}`);
+    },
+  });
+  const order = [...regCodes].sort((a, b) => (value(b) ?? -999) - (value(a) ?? -999));
+  table('#t-rm', ['Region', `${METRIC[state.rmMetric]}: foreign`, 'EU', 'Non-EU', 'Spanish', 'Gap (pts)', 'Foreign 16+ (thousands)'],
+    order.map((rc) => {
+      const f = at(rc, 'fx'), e = at(rc, 'es'), d = epaValues(regIdx.get(rc), si, 'fx', yi);
+      return [name(rc), f == null ? '–' : fp(f), at(rc, 'eu') == null ? '–' : fp(at(rc, 'eu')), at(rc, 'neu') == null ? '–' : fp(at(rc, 'neu')),
+        e == null ? '–' : fp(e), f == null || e == null ? '–' : fpts(f - e), d.pop16 == null ? '–' : d.pop16.toFixed(1)];
+    }));
+}
+
+// ---------- sectors (census table 69964) ----------
+Object.assign(state, { secSort: 'count', secSex: 'all', secYear: null, secRegion: 0 });
+function sectorValues(ri, si, nat, yi) { // sectors: [sex][total, es, fx][year][section]
+  const S = REG.sectors, nY = S.years.length, nS = S.sections.length;
+  const b = ((si * 3 + S.nats.indexOf(nat)) * nY + yi) * nS;
+  return S.regions[ri].v.slice(b, b + nS);
+}
+// two aligned columns of bars: a count (left) and a share (right, with a reference line)
+function twoColBars(id, rows, o) {
+  const el = $(id);
+  const narrow = el.clientWidth < 600;
+  const head = narrow ? 36 : 22, rh = narrow ? 50 : 26;
+  const m = { t: head + 4, r: 4, b: 4, l: narrow ? 0 : (o.labelW || 250) };
+  const { g, w: W } = frame(el, rows.length * rh + m.t + m.b, m);
+  const bW = narrow ? W : 230, gap = narrow ? 0 : 32, aW = narrow ? W : W - bW - gap;
+  const ax = d3.scaleLinear().domain([0, d3.max(rows, (r) => r.a) || 1]).range([0, aW - 64]);
+  const bMax = Math.max(10, Math.ceil(d3.max(rows, (r) => r.b ?? 0) / 10) * 10);
+  const bx = d3.scaleLinear().domain([0, bMax]).range([0, bW - 52]);
+  const b0 = narrow ? 0 : aW + gap;
+  if (narrow) {
+    g.append('text').attr('class', 'lbl').attr('x', 0).attr('y', -24).text(`Wide bar: ${o.aTitle.toLowerCase()}`);
+    g.append('text').attr('class', 'lbl').attr('x', 0).attr('y', -8).text(`Thin bar: ${o.bTitle.toLowerCase()} (0–${bMax}%)`);
+  } else {
+    g.append('text').attr('class', 'lbl').attr('x', 0).attr('y', -10).text(o.aTitle);
+    g.append('text').attr('class', 'lbl').attr('x', b0).attr('y', -10).text(`${o.bTitle} (scale 0–${bMax}%)`);
+  }
+  rows.forEach((r, i) => {
+    const y0 = i * rh;
+    const ay = narrow ? y0 + 17 : y0 + 4, ah = narrow ? 14 : rh - 8;
+    const by = narrow ? ay + ah + 4 : y0 + 7, bh = narrow ? 8 : rh - 14;
+    if (narrow) g.append('text').attr('class', 'lbl').attr('x', 0).attr('y', y0 + 12).text(r.label);
+    else g.append('text').attr('class', 'lbl').attr('x', -10).attr('y', y0 + rh / 2 + 4).attr('text-anchor', 'end').text(r.label);
+    g.append('rect').attr('x', 0).attr('y', ay).attr('width', Math.max(1.5, ax(r.a))).attr('height', ah).attr('rx', 3).attr('fill', o.aColor);
+    g.append('text').attr('class', 'lbl-strong').attr('x', ax(r.a) + 6).attr('y', ay + ah / 2 + 4).text(o.aFmt(r.a));
+    g.append('rect').attr('x', b0).attr('y', by).attr('width', bx.range()[1]).attr('height', bh).attr('rx', 3).attr('fill', css('--band'));
+    if (r.b != null) {
+      g.append('rect').attr('x', b0).attr('y', by).attr('width', Math.max(1.5, bx(r.b))).attr('height', bh).attr('rx', 3).attr('fill', o.bColor);
+      // the value goes after the bar, or after the reference mark when the bar stops short of it
+      const tx = b0 + Math.max(bx(r.b), o.bRef != null && bx(o.bRef) - bx(r.b) < 40 ? bx(o.bRef) : 0) + 6;
+      g.append('text').attr('class', narrow ? 'lbl' : 'lbl-strong').attr('x', tx).attr('y', by + bh / 2 + 4).text(o.bFmt(r.b));
+    }
+    const onMove = (ev) => showTip(ev, o.tip(r));
+    g.append('rect').attr('x', -m.l).attr('y', y0).attr('width', W + m.l).attr('height', rh).attr('fill', 'transparent')
+      .on('pointermove', onMove).on('pointerdown', onMove).on('pointerleave', (ev) => { if (ev.pointerType !== 'touch') hideTip(); });
+  });
+  if (o.bRef != null) { // a short mark on each share bar at the overall share
+    const xr = b0 + bx(o.bRef);
+    rows.forEach((r, i) => {
+      const y0 = i * rh, by = narrow ? y0 + 17 + 14 + 4 : y0 + 7, bh = narrow ? 8 : rh - 14;
+      g.append('line').attr('x1', xr).attr('x2', xr).attr('y1', by - 3).attr('y2', by + bh + 3)
+        .attr('stroke', css('--fg')).attr('stroke-width', 1.5).attr('pointer-events', 'none');
+    });
+  }
+}
+function renderSectors() {
+  if (!CEN || !REG || !REG.sectors) return;
+  const c = C(), S = REG.sectors;
+  const yi = state.secYear == null ? S.years.length - 1 : state.secYear, si = CEN.sexes.indexOf(state.secSex);
+  seg('#sw-sec-sort', [['count', 'By foreign workers'], ['share', 'By foreign share']], state.secSort, (v) => { state.secSort = v; renderSectors(); });
+  seg('#sw-sec-sex', [['all', 'All'], ['men', 'Men'], ['women', 'Women']], state.secSex, (v) => { state.secSex = v; renderSectors(); });
+  seg('#sw-sec-year', S.years.map((y, i) => [String(i), String(y)]), String(yi), (v) => { state.secYear = +v; renderSectors(); });
+  const sel = $('#sel-sec-region');
+  if (!sel.options.length) {
+    sel.innerHTML = cenRegionOptions().replace(/selected/g, '');
+    sel.addEventListener('change', () => { state.secRegion = +sel.value; renderSectors(); });
+  }
+  sel.value = String(state.secRegion);
+  const code = CEN.regions[state.secRegion].code;
+  const ri = S.regions.findIndex((r) => r.code === code);
+  const fx = sectorValues(ri, si, 'fx', yi), tot = sectorValues(ri, si, 'total', yi), es = sectorValues(ri, si, 'es', yi);
+  const fx0 = sectorValues(ri, si, 'fx', 0);
+  const SEC_MIN = 500; // workers in the sector: below this the share is too noisy to show
+  const share = (i) => (tot[i] >= (i === 0 ? 1 : SEC_MIN) ? 100 * fx[i] / tot[i] : null);
+  let rows = S.sections.map((s, i) => ({ i, code: s.code, label: s.name, a: fx[i], b: share(i) }))
+    .filter((r) => r.code !== 'total' && r.code !== 'X' && tot[r.i] > 0);
+  rows.sort((p, q) => (state.secSort === 'count' ? q.a - p.a : (q.b ?? -1) - (p.b ?? -1)));
+  const place = niceName(CEN.regions[state.secRegion].name), sexName = { all: '', men: ', men', women: ', women' }[state.secSex];
+  $('#sec-sub').textContent = `${place}${sexName}, people in work on 1 January ${S.years[yi]}: ${fmt(fx[0])} foreign nationals, ${fp(share(0))} of all workers`;
+  const chg = (i) => (fx0[i] ? `${fx[i] >= fx0[i] ? '+' : ''}${(100 * (fx[i] / fx0[i] - 1)).toFixed(0)}%` : '–');
+  twoColBars('#c-sec', rows, {
+    aTitle: 'Foreign nationals in work', bTitle: 'Foreign share of the sector', aColor: c.fx, bColor: c.fx,
+    aFmt: fk, bFmt: fp, bRef: share(0), labelW: 250,
+    tip: (r) => `<div class="t">${r.code} · ${r.label}</div>` + row('Foreign nationals in work', fmt(fx[r.i]), c.fx)
+      + row('Spanish nationals in work', fmt(es[r.i])) + row('Foreign share', r.b == null ? `– (under ${SEC_MIN} workers)` : fp(r.b)) + row('Foreign share, all sectors', fp(share(0)))
+      + (yi > 0 ? row(`Foreign workers since ${S.years[0]}`, chg(r.i)) : ''),
+  });
+  table('#t-sec', ['Section', 'Sector', 'Foreign nationals', 'Spanish nationals', 'All workers', 'Foreign share', `Foreign, change since ${S.years[0]}`],
+    rows.map((r) => [r.code, r.label, fmt(fx[r.i]), fmt(es[r.i]), fmt(tot[r.i]), r.b == null ? '–' : fp(r.b), chg(r.i)])
+      .concat([['', 'All sectors', fmt(fx[0]), fmt(es[0]), fmt(tot[0]), fp(share(0)), chg(0)]]));
+}
+function renderMaps() { renderProvMap(); renderRegMap(); renderSectors(); }
+const last = (arr) => { for (let i = arr.length - 1; i >= 0; i--) if (arr[i] != null) return [arr[i], i]; return [null, -1]; };
+
+// ---------- KPI tiles ----------
+function kpis() {
+  const P = D.population, E = D.epa, A = D.affiliation, V = D.poverty;
+  const [fxNat, ip] = last(P.fxNat), [born] = last(P.bornAbroad);
+  const [ufx, iu] = last(E.unempRate.fx), [ues] = last(E.unempRate.es);
+  const er = (g) => 100 * E.employed[g][iu] / E.pop16[g][iu];
+  const [aff, ia] = last(A.fx);
+  const [arN, iv] = last(V.arope.neu), [arE] = last(V.arope.es);
+  const nb = D.snapshots.nationalityBirth;
+  const tile = (label, value, unit, ref) => `<div class="kpi"><div class="label">${label}</div><div class="value">${value}${unit ? `<small>${unit}</small>` : ''}</div><div class="ref">${ref}</div></div>`;
+  $('#kpis').innerHTML = [
+    tile('Foreign nationals', fk(fxNat), '', `<b>${fp(P.fxNatShare[ip])}</b> of the population · ${dateLabel('D', P.t[ip])}`),
+    tile('Born abroad', fk(born), '', `<b>${fp(P.bornAbroadShare[ip])}</b> · ${fk(nb.esBornAbroad)} of them Spanish nationals`),
+    tile('Unemployment rate, foreign', ufx.toFixed(1), '%', `Spanish <b>${ues.toFixed(1)}%</b> · ${dateLabel('Q', E.t[iu])}`),
+    tile('In work, % of people 16+, foreign', er('fx').toFixed(1), '%', `Spanish <b>${er('es').toFixed(1)}%</b> · ${dateLabel('Q', E.t[iu])}`),
+    tile('Foreign Social Security affiliates', fk(aff), '', `<b>${fp(A.share[ia])}</b> of all · ${dateLabel('M', A.t[ia])}`),
+    tile('At risk of poverty or exclusion, non-EU', arN.toFixed(1), '%', `Spanish <b>${arE.toFixed(1)}%</b> · ${dateLabel('Y', V.t[iv])}`),
+  ].join('');
+}
+
+// ---------- charts ----------
+function renderAll() {
+  const c = C();
+  const P = D.population, E = D.epa, A = D.affiliation, B = D.benefits, I = D.imv, V = D.poverty, PV = D.epaPV, S = D.snapshots;
+
+  // --- who: nationality x birthplace ---
+  const nb = S.nationalityBirth, tot = nb.esBornEs + nb.esBornAbroad + nb.fxBornAbroad + nb.fxBornEs;
+  $('#nb-sub').textContent = `Population of Spain on ${dateLabel('D', nb.date)}: ${fmt(tot)}`;
+  const nbParts = [
+    { label: 'Spanish, born in Spain', v: nb.esBornEs, color: c.neutral, ink: css('--fg') },
+    { label: 'Spanish, born abroad', v: nb.esBornAbroad, color: c.es },
+    { label: 'Foreign, born abroad', v: nb.fxBornAbroad, color: c.fx, ink: '#062623' },
+    { label: 'Foreign, born in Spain', v: nb.fxBornEs, color: c.eu, ink: '#191B1C' },
+  ];
+  seg100('#c-nb-bar', [{ label: 'Population', parts: nbParts }], { noLabels: true, rowH: 44 });
+  const cell = (p) => `<div class="cell"><b>${fk(p.v)}</b><span><i style="background:${p.color}"></i>${fp(100 * p.v / tot)} of the population</span></div>`;
+  $('#c-nb').innerHTML = `<div></div><div class="h">Born in Spain</div><div class="h">Born abroad</div>`
+    + `<div class="rh">Spanish nationality</div>${cell(nbParts[0])}${cell(nbParts[1])}`
+    + `<div class="rh">Foreign nationality</div>${cell(nbParts[3])}${cell(nbParts[2])}`;
+
+  const popS = [
+    ser(P, P.bornAbroadShare, 'Born abroad', c.es),
+    ser(P, P.fxNatShare, 'Foreign nationality', c.fx),
+  ];
+  legend('#lg-pop', popS);
+  timeChart('#c-pop', { series: popS, fmt: fp, axisFmt: fp0, zero: true, gap: [0, 1], bands: false, labelW: 150, height: 300 });
+  tableSeries('#t-pop', [...popS, ser(P, P.fxNat, 'Foreign nationals', c.fx), ser(P, P.bornAbroad, 'Born abroad (people)', c.es)],
+    (v) => (v > 1000 ? fmt(v) : fp(v)));
+
+  // --- shares ---
+  const pop16share = E.t.map((_, i) => 100 * E.pop16.fx[i] / E.pop16.total[i]);
+  const unempShare = E.t.map((_, i) => 100 * E.unemployed.fx[i] / E.unemployed.total[i]);
+  const shareS = [
+    ser(E, pop16share, 'Population aged 16+', c.total, { short: 'Population 16+', width: 1, dash: true }),
+    ser(E, unempShare, 'Unemployed (EPA)', c.eu, { short: 'Unemployed' }),
+    ser(A, A.share, 'Social Security affiliates', c.fx, { short: 'SS affiliates', width: 2.5 }),
+    ser(B, B.share, 'Unemployment-benefit recipients', c.es, { short: 'Benefit recipients', markers: true }),
+    ser(I, I.share, 'IMV recipients (households)', c.neu, { short: 'IMV recipients' }),
+  ];
+  legend('#lg-shares', [{ label: 'Population aged 16+ (grey area)', kind: 'area' }, ...shareS.slice(1)]);
+  timeChart('#c-shares', { series: shareS, fmt: fp, axisFmt: fp0, zero: true, area: 0, height: 360, labelW: 170 });
+  tableSeries('#t-shares', shareS, fp);
+
+  // --- work: rates ---
+  const RATES = { unempRate: 'Unemployment rate', actRate: 'Activity rate', empRate: 'Employment rate' };
+  const SUBS = {
+    unempRate: 'Unemployed as a share of the labour force (people working or looking for work)',
+    actRate: 'People working or looking for work, as a share of everyone aged 16+',
+    empRate: 'People in work, as a share of everyone aged 16+',
+  };
+  seg('#sw-rate', Object.entries(RATES), state.rate, (v) => { state.rate = v; renderAll(); });
+  seg('#sw-rate-g', [['nat', 'Spanish vs foreign'], ['eu', 'EU / non-EU']], state.rateG, (v) => { state.rateG = v; renderAll(); });
+  $('#rates-title').textContent = RATES[state.rate];
+  $('#rates-sub').textContent = SUBS[state.rate];
+  const rateOf = (g) => state.rate === 'empRate' ? E.t.map((_, i) => 100 * E.employed[g][i] / E.pop16[g][i]) : E[state.rate][g];
+  const rateS = [
+    ser(E, rateOf('total'), 'All', c.total, { dash: true, width: 1.2 }),
+    ser(E, rateOf('es'), 'Spanish', c.es, { width: 2.5 }),
+    ...(state.rateG === 'nat'
+      ? [ser(E, rateOf('fx'), 'Foreign', c.fx, { width: 2.5 })]
+      : [ser(E, rateOf('eu'), 'Foreign, EU', c.eu), ser(E, rateOf('neu'), 'Foreign, non-EU', c.neu)]),
+  ];
+  legend('#lg-rates', rateS);
+  timeChart('#c-rates', { series: rateS, fmt: fp, axisFmt: fp0, zero: state.rate === 'unempRate', height: 340, labelW: 140,
+    events: state.rateG === 'eu' ? [EU_2007] : [] });
+  tableSeries('#t-rates', rateS, fp, 'Quarter');
+
+  // --- work: levels ---
+  seg('#sw-lev', [['employed', 'In work'], ['unemployed', 'Unemployed']], state.lev, (v) => { state.lev = v; renderAll(); });
+  $('#lev-title').textContent = state.lev === 'employed' ? 'Foreign nationals in work' : 'Unemployed foreign nationals';
+  const levL = [
+    { label: 'Foreign, non-EU', short: 'non-EU', color: c.neu, vals: E[state.lev].neu },
+    { label: 'Foreign, EU', short: 'EU', color: c.eu, vals: E[state.lev].eu },
+  ];
+  legend('#lg-lev', [...levL].reverse().map((L) => ({ ...L, kind: 'box' })));
+  stackChart('#c-lev', { t: E.t, freq: 'Q', layers: levL, fmt: fk, height: 300, events: [EU_2007], labelW: 110, totalLabel: 'All foreign' });
+  tableSeries('#t-lev', levL.map((L) => ser(E, L.vals, L.label, L.color)), fmt, 'Quarter');
+
+  // --- work: three counts ---
+  const sp = S.sepe2025;
+  hbars('#c-count', [
+    { label: 'Unemployed (EPA survey)', v: sp.unemployedEpa, color: c.fx, tip: row('Unemployment rate', fp(sp.unempRate)) },
+    { label: 'Registered job seekers', v: sp.registeredUnemployed, color: c.es },
+    { label: 'Receiving a benefit (31 Dec)', v: sp.benefitRecipients, color: c.eu },
+  ], { what: 'People', rowH: 44 });
+
+  // --- jobs: affiliation ---
+  const AFF = { scheme: 'By scheme', eu: 'EU / non-EU', sex: 'Women / men' };
+  seg('#sw-aff', Object.entries(AFF), state.aff, (v) => { state.aff = v; renderAll(); });
+  let affL;
+  if (state.aff === 'scheme') {
+    const other = A.t.map((_, i) => Math.max(0, A.fx[i] - A.general[i] - A.selfEmployed[i] - A.agrarian[i] - A.domestic[i]));
+    affL = [
+      { label: 'General scheme', short: 'General', color: c.fx, vals: A.general },
+      { label: 'Self-employed', short: 'Self-employed', color: c.es, vals: A.selfEmployed },
+      { label: 'Agricultural (special)', short: 'Agricultural', color: c.eu, vals: A.agrarian },
+      { label: 'Domestic work (special)', short: 'Domestic', color: c.neu, vals: A.domestic },
+      { label: 'Other schemes', short: 'Other', color: c.neutral, vals: other },
+    ];
+    $('#aff-sub').textContent = 'Monthly average, by Social Security scheme';
+  } else if (state.aff === 'eu') {
+    affL = [
+      { label: 'Foreign, non-EU', short: 'non-EU', color: c.neu, vals: A.neu },
+      { label: 'Foreign, EU', short: 'EU', color: c.eu, vals: A.eu },
+    ];
+    $('#aff-sub').textContent = 'Monthly average, EU and non-EU nationals';
+  } else {
+    affL = [
+      { label: 'Men', short: 'Men', color: c.fx, vals: A.t.map((_, i) => A.fx[i] - A.women[i]) },
+      { label: 'Women', short: 'Women', color: c.es, vals: A.women },
+    ];
+    $('#aff-sub').textContent = 'Monthly average, by sex';
+  }
+  legend('#lg-aff', [...affL].reverse().map((L) => ({ ...L, kind: 'box' })));
+  stackChart('#c-aff', { t: A.t, freq: 'M', layers: affL, fmt: fk, height: 320, bands: true, events: [REGULARISATION], labelW: 130,
+    totalLabel: 'All foreign affiliates', tipExtra: (i) => row('Share of all affiliates', fp(A.share[i])) });
+  tableSeries('#t-aff', [...affL.map((L) => ser(A, L.vals, L.label, L.color)), ser(A, A.fx, 'All foreign', c.fx), ser(A, A.share, '% of all affiliates', c.fx)],
+    (v) => (v < 100 ? fp(v) : fmt(v)), 'Month');
+
+  // --- jobs: countries ---
+  const BC = D.byCountry, n = BC.t.length - 1;
+  const ctry = Object.entries(BC.countries).map(([k, v]) => ({ label: k, a: v[0], b: v[n] })).sort((p, q) => q.b - p.b);
+  const aL = dateLabel('D', BC.t[0]), bL = dateLabel('D', BC.t[n]);
+  $('#ctry-sub').textContent = `Social Security affiliates by nationality, ${aL} → ${bL}`;
+  legend('#lg-ctry', [{ label: aL, color: css('--muted'), kind: 'box' }, { label: bL, color: c.fx, kind: 'box' }]);
+  dumbbell('#c-ctry', ctry, { aLabel: aL, bLabel: bL });
+  // columns: end of December each year, plus the latest month
+  table('#t-ctry', ['Nationality', ...BC.t.map((k) => (k.slice(5, 7) === '12' ? k.slice(0, 4) : dateLabel('M', k)))],
+    ctry.map((r) => [r.label, ...BC.countries[r.label].map((v) => (v == null ? null : fmt(v)))]));
+
+  // --- benefits ---
+  const yrs = B.t.map((k) => k.slice(0, 4));
+  const benL = [
+    { label: 'Contributory', color: c.fx, vals: B.contributory },
+    { label: 'Assistance subsidies', color: c.es, vals: B.assistance },
+    { label: 'Active Insertion Income (RAI)', color: c.eu, vals: B.rai },
+    { label: 'Employment Activation Programme', color: c.neu, vals: B.pae },
+  ];
+  legend('#lg-ben', benL.map((L) => ({ ...L, kind: 'box' })));
+  barStack('#c-ben', { cats: yrs, layers: benL, height: 300, top: (i) => fp(B.share[i]), tipExtra: (i) => row('Share of all recipients', fp(B.share[i])) });
+  table('#t-ben', ['Year', ...benL.map((L) => L.label), 'Total foreign', '% of all recipients'],
+    yrs.map((y, i) => [y, ...benL.map((L) => (L.vals[i] == null ? null : fmt(L.vals[i]))), fmt(B.fx[i]), fp(B.share[i])]).reverse());
+
+  const b25 = S.benefitsDec2025;
+  $('#ben25-sub').textContent = `Foreign recipients of unemployment benefits, by type: ${fmt(b25.contributory + b25.subsidy + b25.rai + b25.agrarian)} in all`;
+  hbars('#c-ben25', [
+    { label: 'Contributory', v: b25.contributory, color: c.fx },
+    { label: 'Subsidy', v: b25.subsidy, color: c.es },
+    { label: 'Agrarian subsidy', v: b25.agrarian, color: c.neutral },
+    { label: 'RAI', v: b25.rai, color: c.eu },
+  ], { what: 'People', rowH: 40 });
+
+  const imvL = [
+    { label: 'Spanish', color: c.es, vals: I.es },
+    { label: 'Foreign', color: c.fx, vals: I.fx },
+  ];
+  legend('#lg-imv', [...imvL].reverse().map((L) => ({ ...L, kind: 'box' })));
+  stackChart('#c-imv', { t: I.t, freq: 'M', layers: imvL, fmt: fk, height: 280, bands: false, labelW: 120, totalLabel: 'All recipients',
+    tipExtra: (i) => row('Foreign share', fp(I.share[i])) });
+  tableSeries('#t-imv', [ser(I, I.es, 'Spanish', c.es), ser(I, I.fx, 'Foreign', c.fx), ser(I, I.share, 'Foreign share', c.fx)],
+    (v) => (v < 100 ? fp(v) : fmt(v)), 'Month');
+
+  // --- poverty ---
+  const POV = {
+    arope: ['At risk of poverty or social exclusion (AROPE)', 'At risk of poverty, severely deprived, or in a household with very low work intensity. Dotted: the earlier "Europa 2020" definition, before 2014'],
+    poverty: ['At risk of poverty', 'Income below 60% of the national median, after social transfers'],
+    deprivation: ['Severe material and social deprivation', 'Cannot afford at least 7 of 13 basic items (heating, a week of holiday, unexpected expenses…)'],
+    lowWork: ['Low work intensity', 'Living in a household where adults worked less than 20% of their potential'],
+  };
+  seg('#sw-pov', [['arope', 'AROPE'], ['poverty', 'Poverty risk'], ['deprivation', 'Severe deprivation'], ['lowWork', 'Low work intensity']], state.pov, (v) => { state.pov = v; renderAll(); });
+  $('#pov-title').textContent = POV[state.pov][0];
+  $('#pov-sub').textContent = POV[state.pov][1];
+  const PG = [['total', 'All', c.total, { dash: true, width: 1.2 }], ['es', 'Spanish', c.es, {}], ['eu', 'Foreign, EU', c.eu, {}], ['neu', 'Foreign, non-EU', c.neu, {}]];
+  const povS = PG.map(([g, l, col, o]) => ser(V, V[state.pov][g], l, col, { markers: !o.dash, ...o }));
+  let povAll = povS;
+  if (state.pov === 'arope') {
+    const start = povS[0].pts[0].k;
+    const old = PG.map(([g, l, col]) => {
+      const s = ser(V, V.arope2020[g], `${l} (Europa 2020)`, col, { dash: 'dot', width: 1.6, noLabel: true });
+      s.pts = s.pts.filter((p) => p.k < start);
+      return s;
+    });
+    povAll = [...povS, ...old];
+  }
+  legend('#lg-pov', [...povS, ...(state.pov === 'arope' ? [{ label: 'Europa 2020 definition', color: css('--fg-2'), kind: 'dot' }] : [])]);
+  timeChart('#c-pov', { series: povAll, fmt: fp, axisFmt: fp0, zero: true, height: 340, labelW: 140, bands: true,
+    xDomain: state.pov === 'arope' ? null : [pd(V.t[0]), pd(V.t[V.t.length - 1])] });
+  tableSeries('#t-pov', povAll, fp, 'Survey year');
+
+  // --- Basque Country ---
+  seg('#sw-pv', [['smooth', '4-quarter average'], ['raw', 'Quarterly']], state.pv, (v) => { state.pv = v; renderAll(); });
+  const roll = (a) => a.map((_, i) => (i < 3 || a.slice(i - 3, i + 1).some((v) => v == null) ? null : d3.mean(a.slice(i - 3, i + 1))));
+  const pvv = (g) => (state.pv === 'smooth' ? roll(PV.unempRate[g]) : PV.unempRate[g]);
+  $('#pv-sub').textContent = state.pv === 'smooth' ? 'Average of the last four quarters' : 'Quarterly survey estimates (small sample for foreigners)';
+  const pvS = [
+    ser(PV, pvv('total'), 'All', c.total, { dash: true, width: 1.2 }),
+    ser(PV, pvv('es'), 'Spanish', c.es, { width: 2.5 }),
+    ser(PV, pvv('fx'), 'Foreign', c.fx, { width: state.pv === 'raw' ? 1.5 : 2.5 }),
+  ];
+  legend('#lg-pv', pvS);
+  timeChart('#c-pv', { series: pvS, fmt: fp, axisFmt: fp0, zero: true, height: 280, labelW: 110 });
+  tableSeries('#t-pv', pvS, fp, 'Quarter');
+
+  const pvAff = [ser(A, A.pv, 'Foreign affiliates', c.fx, { short: '' })];
+  timeChart('#c-pvaff', { series: pvAff, fmt, axisFmt: fk, zero: true, height: 280, labelW: 70, area: 0 });
+  tableSeries('#t-pvaff', pvAff, fmt, 'Month');
+
+  // work status by continent of birth (Eustat), by sex and province; falls back to Spain / abroad from the workbook
+  const EC = S.eustatContinents;
+  const eusParts = (d) => [
+    { label: 'In work', v: d.employed, color: c.fx, ink: '#062623' },
+    { label: 'Unemployed', v: d.unemployed, color: c.neu },
+    { label: 'Inactive', v: d.inactive, color: c.neutral, ink: css('--fg') },
+  ];
+  const urv = (d) => 100 * d.unemployed / (d.employed + d.unemployed);
+  const ur = (d) => fp(urv(d));
+  legend('#lg-eus', eusParts({}).map((p) => ({ label: p.label, color: p.color, kind: 'box' })));
+  if (EC) {
+    const SEX = [['all', 'All'], ['men', 'Men'], ['women', 'Women']];
+    const TERR = [['pv', 'Basque Country'], ['araba', 'Araba'], ['bizkaia', 'Bizkaia'], ['gipuzkoa', 'Gipuzkoa']];
+    seg('#sw-eus-sex', SEX, state.eusSex, (v) => { state.eusSex = v; renderAll(); });
+    seg('#sw-eus-terr', TERR, state.eusTerr, (v) => { state.eusTerr = v; renderAll(); });
+    const pick = (grp) => EC.groups[grp][state.eusTerr][state.eusSex];
+    const sum = (gs) => ['employed', 'unemployed', 'inactive'].reduce((o, k) => ({ ...o, [k]: d3.sum(gs, (x) => pick(x)[k]) }), {});
+    const GROUPS = [
+      ['Born in Spain', pick('es'), { bold: true }],
+      ['Born abroad, all', sum(['europe', 'africa', 'americas', 'asia']), { bold: true }],
+      ['Europe', pick('europe'), { ruleAbove: true }],
+      ['Africa', pick('africa'), {}],
+      ['Americas', pick('americas'), {}],
+      ['Asia / Oceania', pick('asia'), {}],
+    ];
+    const terrName = TERR.find(([k]) => k === state.eusTerr)[1], sexName = { all: '', men: ', men', women: ', women' }[state.eusSex];
+    $('#eus-sub').textContent = `${terrName}${sexName}, population aged 16+, ${dateLabel('D', EC.date)}`;
+    seg100('#c-eus', GROUPS.map(([label, d, o]) => ({
+      label, parts: eusParts(d), rate: urv(d), ...o,
+    })), { rowH: 46, labelW: 118, mainTitle: 'Share of people aged 16+', rate: RATE_COL(c) });
+    const n = (d) => d.employed + d.unemployed + d.inactive;
+    table('#t-eus', ['Born in', 'People 16+', 'In work', 'Unemployed', 'Inactive', 'In work %', 'Inactive %', 'Unemployment rate'],
+      GROUPS.map(([label, d]) => [label, fmt(n(d)), fmt(d.employed), fmt(d.unemployed), fmt(d.inactive),
+        fp(100 * d.employed / n(d)), fp(100 * d.inactive / n(d)), ur(d)]));
+  } else {
+    const eu = S.eustat;
+    $('#eus-sub').textContent = `Population aged 16+, ${dateLabel('D', eu.date)}`;
+    seg100('#c-eus', [
+      { label: 'Born in Spain', parts: eusParts(eu.bornEs), rate: urv(eu.bornEs) },
+      { label: 'Born abroad', parts: eusParts(eu.bornAbroad), rate: urv(eu.bornAbroad) },
+    ], { rowH: 56, mainTitle: 'Share of people aged 16+', rate: RATE_COL(c) });
+  }
+
+  // --- Basque minimum income (RGI) ---
+  const rg = S.rgi2024, RX = S.rgiContext;
+  const fxAdults = RX ? RX.foreignShareAdults['2024'] : null;
+  // panel 1: part-to-whole, adults vs recipients (only when the census share of adults is available)
+  if (fxAdults != null) {
+    const sp = (fx) => [{ label: 'Spanish nationals', v: 100 - fx, color: c.es }, { label: 'Foreign nationals', v: fx, color: c.fx, ink: '#062623' }];
+    legend('#lg-rgi-share', sp(0).map((p) => ({ label: p.label, color: p.color, kind: 'box' })));
+    seg100('#c-rgi-share', [
+      { label: 'Adults (16+)', parts: sp(fxAdults) },
+      { label: 'RGI recipients', parts: sp(rg.shareForeignOfRecipients) },
+    ], { rowH: 52, labelW: 104, valueFmt: fp });
+    $('#rgi-share-sub').textContent = `Foreign nationals are ${fp(fxAdults)} of adults but ${fp(rg.shareForeignOfRecipients)} of recipients`;
+  } else {
+    $('#c-rgi-share').innerHTML = '<div class="empty">Needs INE census table 67130</div>';
+  }
+  // panel 2: coverage by nationality
+  hbars('#c-rgi', [
+    { label: 'Spanish nationals', v: rg.coverageSpanish, color: c.es },
+    { label: 'Foreign nationals', v: rg.coverageForeign, color: c.fx },
+  ], { fmt: fp, what: 'Share receiving RGI', rowH: 52, max: Math.ceil(rg.coverageForeign * 1.25) });
+  $('#rgi-note').textContent = `About 1 in ${Math.round(100 / rg.coverageSpanish)} Spanish nationals and 1 in ${Math.round(100 / rg.coverageForeign)} foreign nationals: `
+    + `${(rg.coverageForeign / rg.coverageSpanish).toFixed(1)} times as likely. ${fp(100 - rg.coverageForeign)} of foreign nationals do not receive it.`;
+  // panel 3: holders per 100 adults by continent of birth
+  if (RX) {
+    const B = RX.birth, abroad = ['europe', 'africa', 'americas', 'asia'];
+    const all = { holders: d3.sum(abroad, (k) => B[k].holders), pop16: d3.sum(abroad, (k) => B[k].pop16) };
+    const rate = (d) => 100 * d.holders / d.pop16;
+    const tipOf = (d) => row('RGI holders', fmt(d.holders)) + row('People aged 16+', fmt(d.pop16));
+    const bd = RX.birthDetail;
+    hbars('#c-rgi-birth', [
+      { label: 'Born in Spain', v: rate(B.spain), color: c.es, tip: tipOf(B.spain) },
+      { label: 'Born abroad, all', v: rate(all), color: c.fx, tip: tipOf(all) },
+      { label: 'Europe', v: rate(B.europe), color: c.fx, tip: tipOf(B.europe) + row('of which EU', fmt(bd.eu)) },
+      { label: 'Africa', v: rate(B.africa), color: c.fx, tip: tipOf(B.africa) + row('Maghreb', fmt(bd.maghreb)) + row('Sub-Saharan Africa', fmt(bd.subsaharan_africa)) },
+      { label: 'Americas', v: rate(B.americas), color: c.fx, tip: tipOf(B.americas) },
+      { label: 'Asia / Oceania', v: rate(B.asia), color: c.fx, tip: tipOf(B.asia) },
+    ], { fmt: (v) => v.toFixed(1), what: 'Holders per 100 adults', rowH: 30 });
+    const N = RX.nationality;
+    const totH = N.es.holders + N.fx.holders;
+    $('#rgi-foot').textContent = `In ${RX.year}, ${fmt(totH)} people held the RGI at some point, ${fmt(N.fx.holders)} of them foreign nationals `
+      + `(${fp(100 * N.fx.holders / totH)}). Each holder claims for a household: 61% of holders lived alone, and children and other household members `
+      + 'are not counted here. The 2023 rates divide holders at any point in the year by adults on 1 January. By place of birth, naturalised immigrants count as born abroad.';
+    const r1 = (v) => v.toFixed(1);
+    table('#t-rgi', ['Group', 'Year', 'RGI holders', 'Adults 16+', 'Per 100 adults', 'Source'], [
+      ['Spanish nationals (coverage)', 2024, '', '', fp(rg.coverageSpanish), 'Ministerio de Inclusión'],
+      ['Foreign nationals (coverage)', 2024, '', '', fp(rg.coverageForeign), 'Ministerio de Inclusión'],
+      ['Foreign share of recipients', 2024, '', '', fp(rg.shareForeignOfRecipients), 'Ministerio de Inclusión'],
+      ['Foreign share of adults 16+', 2024, '', '', fp(fxAdults), 'INE 67130'],
+      ['Spanish nationals', RX.year, fmt(N.es.holders), fmt(N.es.pop16), r1(rate(N.es)), 'Lanbide via Gasteiz Hoy; INE 67130'],
+      ['Foreign nationals', RX.year, fmt(N.fx.holders), fmt(N.fx.pop16), r1(rate(N.fx)), 'Lanbide via Gasteiz Hoy; INE 67130'],
+      ...[['Born in Spain', B.spain], ['Born abroad, all', all], ['Born in Europe (outside Spain)', B.europe], ['Born in Africa', B.africa],
+        ['Born in the Americas', B.americas], ['Born in Asia / Oceania', B.asia]]
+        .map(([l, d]) => [l, RX.year, fmt(d.holders), fmt(d.pop16), r1(rate(d)), 'Lanbide via Gasteiz Hoy; INE 67129']),
+    ]);
+  }
+
+  renderCensus();
+  renderMaps();
+  renderSchemes();
+  renderContracts();
+}
+
+// ---------- load ----------
+fetch('data.json').then((r) => r.json()).then((d) => {
+  D = d;
+  $('#status').textContent = `Data downloaded ${dateLabel('D', d.generated)}`;
+  $('#foot-gen').textContent = `Figures compiled from the official sources above; data.json built on ${dateLabel('D', d.generated)}.`;
+  kpis();
+  renderAll();
+  // the census table is large, so it loads after the rest of the page
+  return fetch('census.json').then((r) => r.json()).then((cen) => { CEN = cen; renderCensus(); })
+    .catch((e) => { $('#c-cen').innerHTML = '<div class="empty">Could not load census.json</div>'; console.error(e); })
+    // then the maps and sectors: regional figures and the province shapes, in parallel
+    .then(() => Promise.all([
+      fetch('regional.json').then((r) => r.json()).then((d) => { REG = d; }),
+      fetch('provinces.geo.json').then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then((g) => { GEO = g; }).catch((e) => { GEO = false; console.error(e); }),
+    ]))
+    .then(() => renderMaps())
+    .catch((e) => { ['#c-pm', '#c-rm', '#c-sec'].forEach((s) => { $(s).innerHTML = '<div class="empty">Could not load regional.json</div>'; }); console.error(e); });
+}).catch((e) => { $('#status').textContent = 'Could not load data.json'; console.error(e); });
+
+document.addEventListener('pointerdown', (ev) => { if (!ev.target.closest('.chart')) hideTip(); });
+let rt, lastW = innerWidth;
+addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(() => D && renderAll(), 150); });
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => D && renderAll());
+</script>

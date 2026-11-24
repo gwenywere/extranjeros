@@ -22,6 +22,7 @@
   --s3: #BF4049;
   --s4: #A8741F;
   --neutral: #C2C9CC;
+  --in1: #9BA3A8; --in2: #C2C9CC; --in3: #E3E6E8;  /* inactive: pensioners, students, other */
   --seq0: #E0FEFA; --seq1: #50EADF; --seq2: #40BFB6; --seq3: #329992; --seq4: #23726C; --seq5: #144A46;
   --f-display: "Space Grotesk", "Inter", system-ui, sans-serif;
   --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -36,6 +37,7 @@
     --band: rgba(237, 239, 240, 0.05);
     --accent: #50EADF; --on-accent: #062623;
     --s1: #40BFB6; --s2: #986CDC; --s3: #E66368; --s4: #E0A85C; --neutral: #595F61;
+    --in1: #7B8285; --in2: #595F61; --in3: #383B3D;
     --seq0: #144A46; --seq1: #23726C; --seq2: #329992; --seq3: #40BFB6; --seq4: #50EADF; --seq5: #E0FEFA;
     color-scheme: dark;
   }
@@ -47,6 +49,7 @@
   --band: rgba(237, 239, 240, 0.05);
   --accent: #50EADF; --on-accent: #062623;
   --s1: #40BFB6; --s2: #986CDC; --s3: #E66368; --s4: #E0A85C; --neutral: #595F61;
+  --in1: #7B8285; --in2: #595F61; --in3: #383B3D;
   --seq0: #144A46; --seq1: #23726C; --seq2: #329992; --seq3: #40BFB6; --seq4: #50EADF; --seq5: #E0FEFA;
   color-scheme: dark;
 }
@@ -306,6 +309,7 @@ footer a { color: var(--accent); text-underline-offset: 2px; }
           <div><h3>Work status by country of birth</h3><p class="sub" id="cen-sub">Population aged 16+, from the annual census</p></div>
           <div class="controls">
             <div class="seg" id="sw-cen-view" role="group" aria-label="Group by"></div>
+            <div class="seg" id="sw-cen-inact" role="group" aria-label="Inactive"></div>
             <div class="seg" id="sw-cen-sex" role="group" aria-label="Sex"></div>
             <div class="seg" id="sw-cen-year" role="group" aria-label="Year"></div>
             <label class="sel"><span class="vh">Region or province</span><select id="sel-cen-region"></select></label>
@@ -313,7 +317,7 @@ footer a { color: var(--accent); text-underline-offset: 2px; }
         </div>
         <div class="legend" id="lg-cen"></div>
         <div class="chart" id="c-cen"><div class="empty">Loading census data…</div></div>
-        <p class="note" id="cen-note">From INE's annual census, which takes work status from Social Security and employment-office registers, not from a survey. Someone out of work who is not registered at an employment office counts as inactive, not unemployed, so unemployment rates here are not comparable with the EPA's. Born abroad includes people who have since become Spanish citizens.</p>
+        <p class="note" id="cen-note">From INE's annual census, which takes work status from Social Security and employment-office registers, not from a survey. Someone out of work who is not registered at an employment office counts as inactive, not unemployed, so unemployment rates here are not comparable with the EPA's. "Other inactive" is everyone who is neither working, registered as unemployed, receiving a pension nor studying: people looking after the home or family, people out of work but not registered, and so on. Born abroad includes people who have since become Spanish citizens.</p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-cen"></div></details>
         <div class="vars">INE · Censo anual de población · table 67129 · inactive = pensioners + students + other inactive</div>
       </article>
@@ -1006,7 +1010,7 @@ function tableSeries(id, series, f, firstHead = 'Date') {
 
 // ---------- state ----------
 const state = { rate: 'unempRate', rateG: 'nat', lev: 'employed', aff: 'scheme', pov: 'arope', pv: 'smooth', eusSex: 'all', eusTerr: 'pv',
-  cenView: 'cont', cenSex: 'all', cenYear: null, cenRegion: 0 };
+  cenView: 'cont', cenSex: 'all', cenYear: null, cenRegion: 0, cenInact: 'split' };
 let CEN = null; // census.json (INE 67129), loaded after data.json
 
 // ---------- work status by country of birth (INE annual census, table 67129) ----------
@@ -1073,10 +1077,16 @@ function renderCensus() {
   const R = CEN.regions[ri], sexName = { all: '', men: ', men', women: ', women' }[state.cenSex];
   $('#cen-sub').textContent = `${niceName(R.name)}${sexName}, population aged 16+ on 1 January ${CEN.years[yi]}`
     + (hidden ? `. ${hidden} group${hidden > 1 ? 's' : ''} with under ${fmt(MIN)} people not shown` : '');
+  seg('#sw-cen-inact', [['split', 'Inactive by type'], ['combined', 'Inactive combined']], state.cenInact, (v) => { state.cenInact = v; renderCensus(); });
+  // inactive people as one grey block, or split into pensioners / students / other in three greys
+  const inact = (d) => (state.cenInact === 'combined'
+    ? [{ label: 'Inactive', v: d.inactive, color: c.neutral, ink: inkOn(c.neutral) }]
+    : [['pension', 'Pensioners', '--in1'], ['student', 'Students', '--in2'], ['otherInactive', 'Other inactive', '--in3']]
+      .map(([k, label, tok]) => ({ label, v: d[k], color: css(tok), ink: inkOn(css(tok)) })));
   const parts = (d) => [
     { label: 'In work', v: d.employed, color: c.fx, ink: '#062623' },
     { label: 'Unemployed', v: d.unemployed, color: c.neu },
-    { label: 'Inactive', v: d.inactive, color: c.neutral, ink: css('--fg') },
+    ...inact(d),
   ];
   const urs = (d) => (d.employed + d.unemployed ? fp(100 * d.unemployed / (d.employed + d.unemployed)) : '–');
   legend('#lg-cen', parts({}).map((p) => ({ label: p.label, color: p.color, kind: 'box' })));

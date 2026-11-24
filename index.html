@@ -309,6 +309,7 @@ footer a { color: var(--accent); text-underline-offset: 2px; }
           <div><h3>Work status by country of birth</h3><p class="sub" id="cen-sub">Population aged 16+, from the annual census</p></div>
           <div class="controls">
             <div class="seg" id="sw-cen-view" role="group" aria-label="Group by"></div>
+            <div class="seg" id="sw-cen-sort" role="group" aria-label="Order"></div>
             <div class="seg" id="sw-cen-inact" role="group" aria-label="Inactive"></div>
             <div class="seg" id="sw-cen-sex" role="group" aria-label="Sex"></div>
             <div class="seg" id="sw-cen-year" role="group" aria-label="Year"></div>
@@ -1010,7 +1011,7 @@ function tableSeries(id, series, f, firstHead = 'Date') {
 
 // ---------- state ----------
 const state = { rate: 'unempRate', rateG: 'nat', lev: 'employed', aff: 'scheme', pov: 'arope', pv: 'smooth', eusSex: 'all', eusTerr: 'pv',
-  cenView: 'cont', cenSex: 'all', cenYear: null, cenRegion: 0, cenInact: 'split' };
+  cenView: 'cont', cenSex: 'all', cenYear: null, cenRegion: 0, cenInact: 'split', cenSort: 'size' };
 let CEN = null; // census.json (INE 67129), loaded after data.json
 
 // ---------- work status by country of birth (INE annual census, table 67129) ----------
@@ -1065,18 +1066,30 @@ function renderCensus() {
   ];
   let hidden = 0;
   const MIN = 1000;
+  // order of the rows below the line: by size, unemployment rate or share in work (highest first)
+  const SORTS = { size: ['By size', 'number of people aged 16+'], unemp: ['By unemployment', 'unemployment rate'], work: ['By share in work', 'share in work'] };
+  seg('#sw-cen-sort', Object.entries(SORTS).map(([k, [l]]) => [k, l]), state.cenSort, (v) => { state.cenSort = v; renderCensus(); });
+  const sortKey = {
+    size: (d) => d.total,
+    unemp: (d) => (d.employed + d.unemployed ? d.unemployed / (d.employed + d.unemployed) : -1),
+    work: (d) => (d.total ? d.employed / d.total : -1),
+  }[state.cenSort];
+  let rows;
   if (state.cenView === 'cont') {
-    groups = groups.concat(CONT_NAMES.map(([k, label], j) => [label, addUp(abroadIdx.filter((i) => CEN.countries[i].cont === k).map(val)), j === 0 ? { ruleAbove: true } : {}]));
+    rows = CONT_NAMES.map(([k, label]) => [label, addUp(abroadIdx.filter((i) => CEN.countries[i].cont === k).map(val)), {}]);
   } else {
-    const rows = abroadIdx.map((i) => [CEN.countries[i].name, val(i), {}]).sort((a, b) => b[1].total - a[1].total);
-    const shown = rows.filter((r) => r[1].total >= MIN);
-    hidden = rows.length - shown.length;
-    if (shown.length) shown[0][2] = { ruleAbove: true };
-    groups = groups.concat(shown);
+    rows = abroadIdx.map((i) => [CEN.countries[i].name, val(i), {}]);
+    const n = rows.length;
+    rows = rows.filter((r) => r[1].total >= MIN);
+    hidden = n - rows.length;
   }
+  rows.sort((a, b) => sortKey(b[1]) - sortKey(a[1]));
+  if (rows.length) rows[0][2] = { ruleAbove: true };
+  groups = groups.concat(rows);
   const R = CEN.regions[ri], sexName = { all: '', men: ', men', women: ', women' }[state.cenSex];
-  $('#cen-sub').textContent = `${niceName(R.name)}${sexName}, population aged 16+ on 1 January ${CEN.years[yi]}`
-    + (hidden ? `. ${hidden} group${hidden > 1 ? 's' : ''} with under ${fmt(MIN)} people not shown` : '');
+  $('#cen-sub').textContent = `${niceName(R.name)}${sexName}, population aged 16+ on 1 January ${CEN.years[yi]}. `
+    + `${state.cenView === 'cont' ? 'Continents' : 'Countries'} ordered by ${SORTS[state.cenSort][1]}, highest first`
+    + (hidden ? `; ${hidden} group${hidden > 1 ? 's' : ''} with under ${fmt(MIN)} people not shown` : '');
   seg('#sw-cen-inact', [['split', 'Inactive by type'], ['combined', 'Inactive combined']], state.cenInact, (v) => { state.cenInact = v; renderCensus(); });
   // inactive people as one grey block, or split into pensioners / students / other in three greys
   const inact = (d) => (state.cenInact === 'combined'

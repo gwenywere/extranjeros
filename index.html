@@ -1835,7 +1835,8 @@ function renderAll() {
 
   // --- benefits per 100 people of the same group ---
   const BR = D.benefitRates;
-  if (BR) {
+  if (!BR) $('#c-brate').innerHTML = '<div class="empty">No data: data.json was built without the yearbook totals (see README, option --prd). Reload the page if you just rebuilt it.</div>';
+  else {
     const BRM = {
       employed: ['in work', 'people in work', 'In work'],
       active: ['in the labour force', 'people in the labour force (in work or unemployed)', 'Labour force'],
@@ -2023,19 +2024,21 @@ function renderAll() {
 }
 
 // ---------- load ----------
-fetch('data.json').then((r) => r.json()).then((d) => {
+// revalidate every time, so an old cached data file is never used with a newer page
+const NOCACHE = { cache: 'no-cache' };
+fetch('data.json', NOCACHE).then((r) => r.json()).then((d) => {
   D = d;
   $('#status').textContent = `Data downloaded ${dateLabel('D', d.generated)}`;
   $('#foot-gen').textContent = `Figures compiled from the official sources above; data.json built on ${dateLabel('D', d.generated)}.`;
   kpis();
   renderAll();
   // the census table is large, so it loads after the rest of the page
-  return fetch('census.json').then((r) => r.json()).then((cen) => { CEN = cen; renderCensus(); })
+  return fetch('census.json', NOCACHE).then((r) => r.json()).then((cen) => { CEN = cen; renderCensus(); })
     .catch((e) => { $('#c-cen').innerHTML = '<div class="empty">Could not load census.json</div>'; console.error(e); })
     // then the maps and sectors: regional figures and the province shapes, in parallel
     .then(() => Promise.all([
-      fetch('regional.json').then((r) => r.json()).then((d) => { REG = d; }),
-      fetch('provinces.geo.json').then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      fetch('regional.json', NOCACHE).then((r) => r.json()).then((d) => { REG = d; }),
+      fetch('provinces.geo.json', NOCACHE).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then((g) => { GEO = g; }).catch((e) => { GEO = false; console.error(e); }),
     ]))
     .then(() => renderMaps())

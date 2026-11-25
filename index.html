@@ -507,14 +507,14 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
   <section id="benefits">
     <div class="section-head">
       <h2>Benefits</h2>
-      <p>Unemployment benefits are either <b>contributory</b>, paid for by the worker's previous contributions, or <b>assistance</b> subsidies with means tests. The Minimum Living Income (IMV) is a national minimum income for households with low income; it requires at least one year of legal residence.</p>
+      <p>SEPE's unemployment benefits are either <b>contributory</b>, paid for by the worker's previous contributions, or means-tested <b>unemployment subsidies</b>. Other social assistance is separate and not counted in them: the Minimum Living Income (IMV), a national income for low-income households that requires at least one year of legal residence; regional minimum incomes such as the Basque RGI; and family, housing and local aid. This page shows the IMV here and the RGI under Basque Country.</p>
     </div>
     <div class="grid">
       <article class="card span-7">
         <div class="head"><div><h3>Foreign recipients of unemployment benefits</h3><p class="sub">Annual average, by type. Label: share of all recipients who are foreign</p></div></div>
         <div class="legend" id="lg-ben"></div>
         <div class="chart" id="c-ben"></div>
-        <p class="note"><b>Contributory</b>: for people who lost a job after paying contributions for at least a year; paid for up to two years, based on past wages. <b>Assistance subsidies</b>: a flat, means-tested payment for people whose contributory benefit has run out or who did not contribute long enough; includes the farm-worker subsidies in Andalusia and Extremadura. <b>RAI</b>: a means-tested income with job-search help for groups who find work hard: long-term unemployed over 45, people with disabilities, victims of gender violence, returning emigrants. <b>Employment Activation Programme</b>: a temporary payment with job-search support for long-term unemployed people with family responsibilities who had no other benefit, 2015–2020.</p>
+        <p class="note"><b>Contributory</b>: for people who lost a job after paying contributions for at least a year; paid for up to two years, based on past wages. <b>Unemployment subsidies</b> (SEPE's assistance level): a flat, means-tested payment for people whose contributory benefit has run out or who did not contribute long enough; includes the farm-worker subsidies in Andalusia and Extremadura. <b>RAI</b>: a means-tested income with job-search help for groups who find work hard: long-term unemployed over 45, people with disabilities, victims of gender violence, returning emigrants. <b>Employment Activation Programme</b>: a temporary payment with job-search support for long-term unemployed people with family responsibilities who had no other benefit, 2015–2020.</p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-ben"></div></details>
         <div class="vars">Ministerio de Trabajo · Anuario de Estadísticas PEX-1 (SEPE) · 2020 includes furlough (ERTE) effects</div>
       </article>
@@ -1816,7 +1816,7 @@ function renderAll() {
   const yrs = B.t.map((k) => k.slice(0, 4));
   const benL = [
     { label: 'Contributory', color: c.fx, vals: B.contributory },
-    { label: 'Assistance subsidies', color: c.es, vals: B.assistance },
+    { label: 'Unemployment subsidies', color: c.es, vals: B.assistance },
     { label: 'Active Insertion Income (RAI)', color: c.eu, vals: B.rai },
     { label: 'Employment Activation Programme', color: c.neu, vals: B.pae },
   ];

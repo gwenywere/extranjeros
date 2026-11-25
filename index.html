@@ -422,7 +422,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
   <section id="contracts">
     <div class="section-head">
       <h2>Contracts and occupations</h2>
-      <p>Employment contracts registered with the public employment services. Occupations and the 2016 → 2025 trend come from SEPE's annual report on foreign workers; the type of contract from SEPE's monthly contract statistics, for <span class="ct-period">2026 so far</span>. A contract is not a person: foreign nationals signed 3,990,538 contracts but were 1,738,476 people, 2.3 contracts each, so their share of contracts in 2025 (25.5%) was much higher than their share of jobs (14.1% of Social Security affiliates).</p>
+      <p>Employment contracts registered with the public employment services. Occupations come from SEPE's 2025 report on foreign workers; everything else from SEPE's contract statistics, 2007 to <span class="ct-period">2026 so far</span>. A contract is not a person: foreign nationals signed 3,990,538 contracts but were 1,738,476 people, 2.3 contracts each, so their share of contracts in 2025 (25.5%) was much higher than their share of jobs (14.1% of Social Security affiliates).</p>
     </div>
     <div class="grid">
       <article class="card span-12" id="occ-card">
@@ -445,13 +445,14 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
       </article>
 
       <article class="card span-6" id="ctrend-card">
-        <div class="head"><div><h3>Temporary and part-time contracts, 2016 → 2025</h3>
-          <p class="sub">Foreign nationals' contracts, SEPE's own rates. The 2022 labour reform cut temporary contracts, most of all for men</p></div></div>
+        <div class="head"><div><h3 id="ctrend-title">Temporary contracts since 2007</h3>
+          <p class="sub" id="ctrend-sub">Share of each group's contracts that are temporary</p></div>
+          <div class="controls"><div class="seg" id="sw-ctrend" role="group" aria-label="Measure"></div></div></div>
         <div class="legend" id="lg-ctrend"></div>
         <div class="chart" id="c-ctrend"></div>
-        <p class="note">SEPE publishes these rates for foreign nationals only. Its part-time rate is lower than the share of part-time contracts in the report's own tables (men in 2025: 12.3% against 16.5%), and the report does not say how it is defined.</p>
+        <p class="note" id="ctrend-note"></p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-ctrend"></div></details>
-        <div class="vars">SEPE report p. 38 (SISPE, contracts registered 2016–2025)</div>
+        <div class="vars">SEPE · Estadística de contratos, December year-to-date tables for each year and the latest for <span class="ct-period">2026 so far</span>: contracts to foreign nationals by type (table 38.1–43.1), all contracts by type (17.1, 18.1) · Spanish = all − foreign · the last point is part of a year (dashed)</div>
       </article>
       <article class="card span-12" id="ctype-card">
         <div class="head"><div><h3>Type of contract: foreign vs Spanish nationals</h3>
@@ -473,6 +474,20 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
         <p class="note" id="ctype-note"></p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-ctype"></div></details>
         <div class="vars">SEPE · Estadística de contratos, <span class="ct-period">2026 so far</span>, year-to-date tables 13.3A, 13.3.1A and 13.3.2A (all contracts), 13.3.3A and 43.3A (foreign nationals) · Spanish = all − foreign · permanent = initial permanent contracts + conversions to permanent · fixed-discontinuous = permanent contracts for seasonal or intermittent work</div>
+      </article>
+
+      <article class="card span-12" id="cmap-card">
+        <div class="head">
+          <div><h3 id="cm-title">Contracts by province</h3><p class="sub" id="cm-sub">Contracts signed in the year</p></div>
+          <div class="controls">
+            <div class="seg" id="sw-cm-metric" role="group" aria-label="Measure"></div>
+            <label class="sel"><span class="vh">Year</span><select id="sel-cm-year"></select></label>
+          </div>
+        </div>
+        <div class="chart" id="c-cm"><div class="empty">Loading map…</div></div>
+        <p class="note" id="cm-note"></p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-cm"></div></details>
+        <div class="vars">SEPE · Estadística de contratos, year-to-date tables by province (contracts to foreign nationals by type; all contracts, tables 17.1 and 18.1) · province where the job is · Spanish = all − foreign · permanent = initial permanent contracts + conversions to permanent</div>
       </article>
     </div>
   </section>
@@ -831,7 +846,12 @@ function timeChart(id, opt) {
   opt.series.forEach((s) => {
     g.append('path').attr('fill', 'none').attr('stroke', s.color).attr('stroke-width', s.width || 2)
       .attr('stroke-dasharray', s.dash === 'dot' ? '1.5 3' : s.dash ? '5 4' : null).attr('stroke-linecap', s.dash === 'dot' ? 'round' : null)
-      .attr('stroke-linejoin', 'round').attr('d', line(s.pts));
+      .attr('stroke-linejoin', 'round').attr('d', line(s.dashLast ? s.pts.slice(0, -1) : s.pts));
+    if (s.dashLast && s.pts.length > 1) { // last point covers part of a period
+      g.append('path').attr('fill', 'none').attr('stroke', s.color).attr('stroke-width', s.width || 2).attr('stroke-dasharray', '4 3').attr('d', line(s.pts.slice(-2)));
+      const p = s.pts[s.pts.length - 1];
+      g.append('circle').attr('cx', x(p.t)).attr('cy', y(p.v)).attr('r', 3.5).attr('fill', css('--surface')).attr('stroke', s.color).attr('stroke-width', 2);
+    }
     if (s.markers) s.pts.forEach((p) => g.append('circle').attr('cx', x(p.t)).attr('cy', y(p.v)).attr('r', 3.5)
       .attr('fill', s.color).attr('stroke', css('--surface')).attr('stroke-width', 1.5));
   });
@@ -1344,16 +1364,123 @@ function renderContracts() {
       .concat(AGE.map((l, i) => row(`Temporary, ${l.toLowerCase()}`, CC.byAge.fx[i], CC.byAge.es[i], 'temporary'))));
   }
 
-  const TR = R.contracts_trend;
-  const trRows = [['temporary_rate_men', 'Temporary, men'], ['temporary_rate_women', 'Temporary, women'],
-    ['part_time_rate_men', 'Part time, men'], ['part_time_rate_women', 'Part time, women']].map(([k, l]) => ({ label: l, a: TR[k]['2016'], b: TR[k]['2025'] }));
-  legend('#lg-ctrend', [{ label: '2016', color: css('--muted'), kind: 'box' }, { label: '2025', color: c.fx, kind: 'box' }]);
-  dumbbell('#c-ctrend', trRows, {
-    aLabel: '2016', bLabel: '2025', fmt: fpMaybe, tipFmt: fp, max: 100, labelW: 116,
-    change: (r) => `${r.b - r.a > 0 ? '+' : ''}${(r.b - r.a).toFixed(1)} pts`,
-  });
-  table('#t-ctrend', ['Rate', '2016', '2025', 'Change'], trRows.map((r) => [r.label, fp(r.a), fp(r.b), `${(r.b - r.a).toFixed(1)} pts`]));
+  renderContractTrend();
 }
+
+// ---------- contracts since 2007 (SEPE December year-to-date workbooks) ----------
+const MONTH_RANGE = (m) => (m === 1 ? 'Jan' : `Jan–${MON[m - 1]}`);
+function renderContractTrend() {
+  const Y = D.contractYears;
+  $('#ctrend-card').hidden = !Y;
+  if (!Y) return;
+  const c = C(), n = Y.years.length, pm = Y.partialMonth;
+  const at = (i) => ({ fxP: Y.fxPerm[i], fxT: Y.fxTemp[i], esP: Y.allPerm[i] - Y.fxPerm[i], esT: Y.allTemp[i] - Y.fxTemp[i] });
+  const rows = Y.years.map((y, i) => {
+    const d = at(i), fx = d.fxP + d.fxT, es = d.esP + d.esT;
+    return { y, fx, es, fxTemp: 100 * d.fxT / fx, esTemp: 100 * d.esT / es, share: 100 * fx / (fx + es) };
+  });
+  // a part year sits in the middle of the months it covers
+  const when = (r, i) => (pm && i === n - 1 ? new Date(r.y, 0, 1 + Math.round(pm * 30.4 / 2)) : new Date(r.y, 6, 1));
+  const pts = (f) => rows.map((r, i) => ({ t: when(r, i), k: `${r.y}-07-01`, v: f(r) }));
+  const yearLbl = (y) => (pm && y === Y.years[n - 1] ? `${MONTH_RANGE(pm)} ${y}` : String(y));
+  state.ctrend = state.ctrend || 'temp';
+  seg('#sw-ctrend', [['temp', 'Temporary'], ['share', 'Foreign share']], state.ctrend, (v) => { state.ctrend = v; renderContractTrend(); });
+  const REFORM = { t: '2022-03-30', label: 'labour reform' };
+  const tipExtra = (hp) => (pm && hp.k.startsWith(String(Y.years[n - 1])) ? `<div style="color:var(--muted);margin-top:4px">${MONTH_RANGE(pm)} only</div>` : '');
+  if (state.ctrend === 'temp') {
+    $('#ctrend-title').textContent = 'Temporary contracts since 2007';
+    $('#ctrend-sub').textContent = "Share of each group's contracts that are temporary";
+    legend('#lg-ctrend', [{ label: 'Foreign nationals', color: c.fx }, { label: 'Spanish nationals', color: c.es }]);
+    timeChart('#c-ctrend', {
+      series: [
+        { label: 'Foreign nationals', short: 'Foreign', color: c.fx, freq: 'Y', dashLast: !!pm, pts: pts((r) => r.fxTemp) },
+        { label: 'Spanish nationals', short: 'Spanish', color: c.es, freq: 'Y', dashLast: !!pm, pts: pts((r) => r.esTemp) },
+      ],
+      fmt: fp, axisFmt: (v) => `${v}%`, zero: true, events: [REFORM], labelW: 120, tipExtra,
+    });
+  } else {
+    $('#ctrend-title').textContent = 'Foreign nationals’ share of all contracts';
+    $('#ctrend-sub').textContent = 'Contracts signed by foreign nationals as a share of all contracts signed in the year';
+    legend('#lg-ctrend', [{ label: 'Foreign nationals', color: c.fx }]);
+    timeChart('#c-ctrend', {
+      series: [{ label: 'Foreign share', short: '', color: c.fx, freq: 'Y', dashLast: !!pm, pts: pts((r) => r.share) }],
+      fmt: fp, axisFmt: (v) => `${v}%`, zero: true, events: [REGULARISATION], labelW: 70, tipExtra,
+    });
+  }
+  const pre = rows.filter((r) => r.y <= 2021), post = rows.filter((r) => r.y >= 2023);
+  const gap = (rs) => d3.mean(rs, (r) => r.esTemp - r.fxTemp);
+  const last = rows[n - 1], lastFull = rows[pm ? n - 2 : n - 1], low = d3.least(rows, (r) => r.share);
+  $('#ctrend-note').textContent = state.ctrend === 'temp'
+    ? `Until 2021 about 9 in 10 contracts were temporary for both groups, foreign nationals' slightly fewer (${gap(pre).toFixed(1)} points less on average). `
+      + `The 2022 labour reform limited temporary contracts and cut them for both, but more for foreign nationals: since 2023 their contracts are about ${Math.round(gap(post))} points less often temporary than Spanish nationals'. `
+      + 'Much of the drop went to fixed-discontinuous contracts, which count as permanent.'
+    : `Foreign nationals' share of contracts fell from ${fp(rows[0].share)} in ${rows[0].y} to ${fp(low.share)} in ${low.y}, after the recession, and has risen almost every year since, to ${fp(lastFull.share)} in ${lastFull.y}`
+      + (pm ? ` and ${fp(last.share)} in ${yearLbl(last.y)}, the year of the regularisation of undocumented immigrants.` : '.')
+      + ' A contract is not a job: someone on short contracts signs many.';
+  table('#t-ctrend', ['Year', 'Temporary, foreign', 'Temporary, Spanish', 'Foreign share of contracts', 'Contracts, foreign', 'Contracts, all'],
+    rows.map((r) => [yearLbl(r.y), fp(r.fxTemp), fp(r.esTemp), fp(r.share), fmt(r.fx), fmt(r.fx + r.es)]));
+}
+
+// ---------- contracts by province (regional.json → contracts) ----------
+Object.assign(state, { cmMetric: 'share', cmYear: null });
+function renderContractMap() {
+  const K = REG && REG.contracts;
+  $('#cmap-card').hidden = !K;
+  if (!K || !CEN) return;
+  const nY = K.years.length, pm = K.partialMonth;
+  const yi = state.cmYear == null ? nY - 1 : state.cmYear;
+  const yLbl = (i) => (pm && i === nY - 1 ? `${K.years[i]} (${MONTH_RANGE(pm)})` : String(K.years[i]));
+  const sel = $('#sel-cm-year');
+  if (!sel.options.length) {
+    sel.innerHTML = K.years.map((y, i) => `<option value="${i}">${yLbl(i)}</option>`).reverse().join('');
+    sel.addEventListener('change', () => { state.cmYear = +sel.value; renderContractMap(); });
+  }
+  sel.value = String(yi);
+  const METRIC = { share: 'Foreign share', fxtemp: 'Temporary, foreign', estemp: 'Temporary, Spanish', gap: 'Gap' };
+  seg('#sw-cm-metric', Object.entries(METRIC), state.cmMetric, (v) => { state.cmMetric = v; renderContractMap(); });
+  const P = provinces(), rows = new Map();
+  Object.entries(K.prov).forEach(([code, v]) => {
+    const b = yi * 4, fxP = v[b], fxT = v[b + 1], esP = v[b + 2] - fxP, esT = v[b + 3] - fxT, fx = fxP + fxT, es = esP + esT;
+    rows.set(code, { p: P.get(code), fx, es, share: 100 * fx / (fx + es), fxTemp: 100 * fxT / fx, esTemp: 100 * esT / es });
+  });
+  rows.forEach((r) => { r.gap = r.fxTemp - r.esTemp; });
+  const metric = { share: (r) => r.share, fxtemp: (r) => r.fxTemp, estemp: (r) => r.esTemp, gap: (r) => r.gap }[state.cmMetric];
+  const vals = [...rows.values()].map(metric);
+  const ext = d3.extent(vals);
+  const color = state.cmMetric === 'gap' ? divColor(ext[0], ext[1]) : seqColor(ext);
+  const domain = state.cmMetric === 'gap' ? (() => { const m = Math.max(...ext.map(Math.abs)); return [-m, m]; })() : ext;
+  const pts = (v) => `${v > 0 ? '+' : ''}${v.toFixed(1)} pts`;
+  const lbl = { share: 'Foreign nationals’ share of contracts', fxtemp: 'Share of foreign nationals’ contracts that are temporary',
+    estemp: 'Share of Spanish nationals’ contracts that are temporary', gap: 'Temporary share, foreign − Spanish nationals' }[state.cmMetric];
+  $('#cm-title').textContent = `Contracts by province: ${lbl[0].toLowerCase()}${lbl.slice(1)}`;
+  $('#cm-sub').textContent = `Contracts signed in ${pm && yi === nY - 1 ? `${MONTH_RANGE(pm)} ${K.years[yi]}` : K.years[yi]}, by province of the job`;
+  drawMap('#c-cm', {
+    value: (code) => (rows.has(code) ? metric(rows.get(code)) : null),
+    color,
+    legend: { domain, fmt: state.cmMetric === 'gap' ? (v) => `${v > 0 ? '+' : ''}${Math.round(v)}` : fp0, title: state.cmMetric === 'gap' ? 'Points (teal: foreign more often temporary)' : METRIC[state.cmMetric] + ' %' },
+    tip: (code) => {
+      const r = rows.get(code); if (!r || !r.p) return '';
+      return `<div class="t">${r.p.name}</div>` + row('Foreign share of contracts', fp(r.share), state.cmMetric === 'share' ? color(r.share) : null)
+        + row('Temporary, foreign nationals', fp(r.fxTemp), c0(state.cmMetric === 'fxtemp', color, r.fxTemp))
+        + row('Temporary, Spanish nationals', fp(r.esTemp), c0(state.cmMetric === 'estemp', color, r.esTemp))
+        + row('Gap', pts(r.gap), c0(state.cmMetric === 'gap', color, r.gap))
+        + row('Contracts, foreign nationals', fmt(r.fx)) + row('Region', r.p.regionName);
+    },
+  });
+  const list = [...rows.values()].filter((r) => r.p).sort((a, b) => metric(b) - metric(a));
+  const top = list.slice(0, 3).map((r) => r.p.name);
+  const neg = list.filter((r) => r.gap < 0).length;
+  $('#cm-note').textContent = {
+    share: `Foreign nationals sign the largest share of contracts in ${top.join(', ').replace(/, ([^,]*)$/, ' and $1')}.`,
+    fxtemp: `Highest in ${top.join(', ').replace(/, ([^,]*)$/, ' and $1')}. Switch to "Gap" to compare with Spanish nationals in the same province.`,
+    estemp: `Highest in ${top.join(', ').replace(/, ([^,]*)$/, ' and $1')}. Switch to "Gap" to compare with foreign nationals in the same province.`,
+    gap: `In ${yLbl(yi)}, foreign nationals' contracts were less often temporary than Spanish nationals' in ${neg} of ${list.length} provinces. `
+      + (K.years[yi] >= 2022 ? 'Before the 2022 labour reform the gap was small almost everywhere: pick 2021 to compare.' : 'After the 2022 labour reform it widened almost everywhere: pick a later year to compare.'),
+  }[state.cmMetric];
+  table('#t-cm', ['Province', 'Region', 'Contracts, foreign', 'Foreign share', 'Temporary, foreign', 'Temporary, Spanish', 'Gap'],
+    list.map((r) => [r.p.name, r.p.regionName, fmt(r.fx), fp(r.share), fp(r.fxTemp), fp(r.esTemp), pts(r.gap)]));
+}
+const c0 = (on, color, v) => (on ? color(v) : null);
 
 // ======================================================================
 // Maps and sectors (regional.json + provinces.geo.json, loaded after census.json)
@@ -1640,7 +1767,7 @@ function sectorValues(ri, si, nat, yi) { // sectors: [sex][total, es, fx][year][
 // two aligned columns of bars: a count (left) and a share (right, with a reference line)
 function twoColBars(id, rows, o) {
   const el = $(id);
-  const narrow = el.clientWidth < 600;
+  const narrow = el.clientWidth < 760; // below this the two column headings collide
   const head = narrow ? 36 : 22, rh = narrow ? 50 : 26;
   const m = { t: head + 4, r: 4, b: 4, l: narrow ? 0 : (o.labelW || 250) };
   const { g, w: W } = frame(el, rows.length * rh + m.t + m.b, m);
@@ -1720,7 +1847,7 @@ function renderSectors() {
     rows.map((r) => [r.code, r.label, fmt(fx[r.i]), fmt(es[r.i]), fmt(tot[r.i]), r.b == null ? '–' : fp(r.b), chg(r.i)])
       .concat([['', 'All sectors', fmt(fx[0]), fmt(es[0]), fmt(tot[0]), fp(share(0)), chg(0)]]));
 }
-function renderMaps() { renderProvMap(); renderRegMap(); renderSectors(); }
+function renderMaps() { renderProvMap(); renderRegMap(); renderSectors(); renderContractMap(); }
 const last = (arr) => { for (let i = arr.length - 1; i >= 0; i--) if (arr[i] != null) return [arr[i], i]; return [null, -1]; };
 
 // ---------- KPI tiles ----------
@@ -1752,7 +1879,7 @@ document.addEventListener('click', ev => {
 const BASIS = { nat: 'By nationality', birth: 'By country of birth', both: 'By nationality and country of birth' };
 const BASIS_OF = {
   'c-nb-bar': 'both', 'c-pop': 'both', 'c-shares': 'nat', 'c-rates': 'nat', 'c-lev': 'nat', 'c-count': 'nat', 'c-cen': 'birth',
-  'c-pm': 'nat', 'c-rm': 'nat', 'c-sec': 'nat', 'c-occ': 'nat', 'c-grp': 'nat', 'c-ctype': 'nat', 'c-ctrend': 'nat', 'c-aff': 'nat', 'c-ctry': 'nat',
+  'c-pm': 'nat', 'c-rm': 'nat', 'c-sec': 'nat', 'c-occ': 'nat', 'c-grp': 'nat', 'c-ctype': 'nat', 'c-ctrend': 'nat', 'c-cm': 'nat', 'c-aff': 'nat', 'c-ctry': 'nat',
   'c-sch': 'nat', 'c-ben': 'nat', 'c-ben25': 'nat', 'c-brate': 'nat', 'c-imv': 'nat', 'c-pov': 'nat', 'c-pv': 'nat', 'c-pvaff': 'nat',
   'c-eus': 'birth', 'c-rgi-share': 'both',
 };

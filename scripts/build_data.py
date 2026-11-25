@@ -538,6 +538,147 @@ def contracts_acum(path: Path) -> dict:
     return out
 
 
+# SEPE province names (all spellings 2007-2026) -> INE province code
+SEPE_PROV = {
+    'ALMERIA': '04', 'CADIZ': '11', 'CORDOBA': '14', 'GRANADA': '18', 'HUELVA': '21', 'JAEN': '23', 'MALAGA': '29', 'SEVILLA': '41',
+    'HUESCA': '22', 'TERUEL': '44', 'ZARAGOZA': '50', 'PRINCIPADO DE ASTURIAS': '33', 'ASTURIAS (PRINCIPADO DE)': '33',
+    'ILLES BALEARS': '07', 'BALEARS (ILLES)': '07', 'PALMAS LAS': '35', 'LAS PALMAS': '35', 'STA. CRUZ DE TENERIFE': '38',
+    'STA. C. TENERIFE': '38', 'CANTABRIA': '39', 'ALBACETE': '02', 'CIUDAD REAL': '13', 'CUENCA': '16', 'GUADALAJARA': '19',
+    'TOLEDO': '45', 'AVILA': '05', 'BURGOS': '09', 'LEON': '24', 'PALENCIA': '34', 'SALAMANCA': '37', 'SEGOVIA': '40',
+    'SORIA': '42', 'VALLADOLID': '47', 'ZAMORA': '49', 'BARCELONA': '08', 'GIRONA': '17', 'LLEIDA': '25', 'TARRAGONA': '43',
+    'ALICANTE/ALACANT': '03', 'CASTELLON/CASTELLO': '12', 'VALENCIA': '46', 'BADAJOZ': '06', 'CACERES': '10',
+    'CORUÑA A': '15', 'A CORUÑA': '15', 'LUGO': '27', 'OURENSE': '32', 'PONTEVEDRA': '36', 'COM. DE MADRID': '28',
+    'MADRID (COM. DE)': '28', 'REGION DE MURCIA': '30', 'MURCIA (REGION DE)': '30', 'COM. FORAL DE NAVARRA': '31',
+    'NAVARRA (COM. FORAL DE)': '31', 'ARABA/ALAVA': '01', 'ARABA/ÁLAVA': '01', 'ALAVA': '01', 'GIPUZKOA': '20',
+    'GUIPUZCOA': '20', 'BIZKAIA': '48', 'VIZCAYA': '48', 'LA RIOJA': '26', 'RIOJA (LA)': '26', 'CEUTA': '51', 'MELILLA': '52',
+    'TOTAL': 'ES',
+}
+
+
+def _title(df) -> str:
+    return re.sub(' +', ' ', ' '.join(str(v) for v in df.iloc[:2].values.ravel() if isinstance(v, str))).strip()
+
+
+def _num(v) -> int:
+    return 0 if v is None or (isinstance(v, float) and np.isnan(v)) or (isinstance(v, str) and not v.strip()) else int(v)
+
+
+def _province_rows(df, name_col: int, cols: list[int]) -> dict[str, list[int]]:
+    """{INE code or 'ES': values in `cols`} for the rows whose label in `name_col` is a province, a one-province region or TOTAL."""
+    out = {}
+    for r in range(df.shape[0]):
+        v = df.iat[r, name_col]
+        if not isinstance(v, str) or v.strip() not in SEPE_PROV:
+            continue
+        nxt = df.iat[r, name_col + 1]
+        if isinstance(nxt, str) and nxt.strip():  # a header cell, not a data row
+            continue
+        code = SEPE_PROV[v.strip()]
+        if code in out:
+            raise SystemExit(f'province {v!r} appears twice')
+        out[code] = [_num(df.iat[r, c]) for c in cols]
+    return out
+
+
+def contracts_by_province(path: Path) -> dict:
+    """One SEPE year-to-date workbook -> {'year', 'month', 'prov': {code: [fx_perm, fx_temp, all_perm, all_temp]}}.
+    Foreign: table 'contratos a extranjeros según tipo de contrato' (EU + non-EU, initial permanent + converted, temporary).
+    All: table 17.1 (initial contracts, conversions) and 18.1 both sexes (initial contracts by type; permanent = the
+    'indefinido' types, including those for people with disabilities, 'fomento' and 'minusválidos' before 2010)."""
+    book = {k.strip(): v for k, v in pd.read_excel(path, sheet_name=None, header=None, engine='calamine').items()}
+    def fail(msg):
+        raise SystemExit(f'{path}: {msg}')
+    titles = {k: _title(df) for k, df in book.items()}
+    # foreign nationals: name col, then total | EU total, initial perm, converted, temporary | non-EU same
+    fx_sheet = [k for k, t in titles.items() if re.search('CONTRATOS A EXTRANJEROS SEG[UÚ]N TIPO DE CONTRATO', t)]
+    if len(fx_sheet) != 1:
+        fail(f'foreign contracts table not found ({fx_sheet})')
+    df = book[fx_sheet[0]]
+    m = re.search(r'(' + '|'.join(MONTHS_ES) + r') (\d{4})', ' '.join(str(v) for v in df.iloc[:6].values.ravel() if isinstance(v, str)))
+    if not m:
+        fail('no period found')
+    month, year = MONTHS_ES.index(m.group(1)) + 1, int(m.group(2))
+    name_col = next(c for c in range(4) if any(isinstance(v, str) and v.strip() == 'ALMERIA' for v in df[c]))
+    fx = _province_rows(df, name_col, list(range(name_col + 1, name_col + 10)))
+    for code, v in fx.items():
+        if v[0] != v[1] + v[5] or v[1] != sum(v[2:5]) or v[5] != sum(v[6:9]):
+            fail(f'foreign contracts in {code} do not add up: {v}')
+
+    # all contracts: initial + converted (table 17.1, both sexes = first two such columns)
+    t17 = [k for k, t in titles.items() if re.match(r'17\.1A? CONTRATOS DE TRABAJO INICIALES', t)]
+    df = book[t17[0]]
+    hdr = {c: ' '.join(str(df.iat[r, c]) for r in range(2, 7) if isinstance(df.iat[r, c], str)) for c in range(df.shape[1])}
+    c_ini = min(c for c, h in hdr.items() if 'INICIALES' in h)
+    c_conv = min(c for c, h in hdr.items() if 'CONVERT' in h)
+    name_col = next(c for c in range(3) if any(isinstance(v, str) and v.strip() == 'ALMERIA' for v in df[c]))
+    a17 = _province_rows(df, name_col, [c_ini, c_conv])
+
+    # initial contracts by type (table 18.1, both sexes, with its continuation)
+    perm = {k: 0 for k in a17}; ini = {k: 0 for k in a17}; tot18 = {}
+    sheets18 = [k for k, t in titles.items() if re.match(r'18\.1A? CONTRATOS DE TRABAJO INICIALES SEG', t) and 'AMBOS SEXOS' in t]
+    if not sheets18:
+        fail('table 18.1 not found')
+    for k in sheets18:
+        df = book[k]
+        name_cols = [c for c in range(df.shape[1]) if any(isinstance(v, str) and v.strip() == 'ALMERIA' for v in df[c])]
+        for i, n in enumerate(name_cols):
+            cols = list(range(n + 1, name_cols[i + 1] if i + 1 < len(name_cols) else df.shape[1]))
+            labels = {c: re.sub(' +', ' ', ' '.join(str(df.iat[r, c]).strip() for r in range(3, 7) if isinstance(df.iat[r, c], str))).strip() for c in cols}
+            labels = {c: l for c, l in labels.items() if l and not re.fullmatch(r'(' + '|'.join(MONTHS_ES) + r') \d{4}', l)}
+            rows = _province_rows(df, n, list(labels))
+            for code, vals in rows.items():
+                for (c, l), v in zip(labels.items(), vals):
+                    if l.startswith('TOTAL'):
+                        tot18[code] = v
+                    elif re.match(r'(INDEF|MINUSV|PERS\. CON DISCAPA)', l):
+                        perm[code] += v; ini[code] += v
+                    else:
+                        ini[code] += v
+    out = {}
+    for code, (i17, conv) in a17.items():
+        if ini[code] != i17 or tot18.get(code, i17) != i17:
+            fail(f'initial contracts in {code}: types add up to {ini[code]}, table 17.1 says {i17}')
+        if code not in fx:
+            fail(f'{code} missing from the foreign contracts table')
+        f = fx[code]
+        fxp, fxt = f[2] + f[3] + f[6] + f[7], f[4] + f[8]
+        allp, allt = perm[code] + conv, i17 - perm[code]
+        if fxp > allp or fxt > allt:
+            fail(f'{code}: more foreign than total contracts')
+        out[code] = [fxp, fxt, allp, allt]
+    if set(out) != set(SEPE_PROV.values()):
+        fail(f'provinces missing: {sorted(set(SEPE_PROV.values()) - set(out))}')
+    provs = [c for c in out if c != 'ES']
+    for j in range(4):
+        if sum(out[c][j] for c in provs) > out['ES'][j]:
+            fail('provinces add up to more than the national total')
+    return {'year': year, 'month': month, 'prov': out}
+
+
+def contracts_years(folder: Path, current: Path | None) -> tuple[dict, dict]:
+    """December year-to-date workbooks (one per year) + the current year's latest one.
+    -> (national series for data.json, province panel for regional.json)."""
+    files = sorted(folder.glob('contratos_acum_*12.xls'))
+    years = [contracts_by_province(f) for f in files]
+    for y, f in zip(years, files):
+        if y['month'] != 12:
+            raise SystemExit(f'{f}: expected December, got month {y["month"]}')
+    if current and current.exists():
+        cur = contracts_by_province(current)
+        if cur['year'] > years[-1]['year']:
+            years.append(cur)
+    ys = [y['year'] for y in years]
+    if ys != list(range(ys[0], ys[-1] + 1)):
+        raise SystemExit(f'{folder}: years missing in {ys}')
+    partial = years[-1]['month'] if years[-1]['month'] != 12 else None
+    K = ['fxPerm', 'fxTemp', 'allPerm', 'allTemp']
+    nat = {'years': ys, 'partialMonth': partial, **{k: [y['prov']['ES'][j] for y in years] for j, k in enumerate(K)}}
+    codes = sorted(c for c in years[0]['prov'] if c != 'ES')
+    prov = {'years': ys, 'partialMonth': partial, 'fields': K,
+            'prov': {c: [v for y in years for v in y['prov'][c]] for c in codes}}
+    return nat, prov
+
+
 def build(series_file: Path, snapshot_file: Path, eustat_csv: Path | None = None) -> dict:
     rd = lambda sheet: pd.read_excel(series_file, sheet_name=sheet)
     d: dict = {'generated': date.today().isoformat()}
@@ -692,6 +833,8 @@ def main() -> None:
                     help='Households and persons by nationality of members (ECEPOV 2021, INE table 56556)')
     ap.add_argument('--households', type=Path, default=Path('data/ine_60135_hogares_total.csv'),
                     help='Total households, quarterly (Estadística Continua de Población, INE table 60135)')
+    ap.add_argument('--contracts-years', type=Path, default=Path('data/sepe_contratos_acum'),
+                    help='Folder of SEPE year-to-date workbooks for December of each year (contratos_acum_YYYY12.xls)')
     ap.add_argument('--contracts', type=Path, default=Path('data/ESTADISTICA_DE_CONTRATOS_ACUM.xls'),
                     help='SEPE Estadística de contratos, year-to-date workbook (tables 13.3A, 13.3.1A, 13.3.2A, 13.3.3A, 43.1A, 43.3A)')
     ap.add_argument('--prd', type=Path, default=Path('data/mites_prd1_beneficiarios_2013_2024.csv'),
@@ -707,7 +850,10 @@ def main() -> None:
         regional['censusNat'] = census_nationality(args.census_nat)
     if args.sectors.exists():
         regional['sectors'] = census_sectors(args.sectors)
-    missing = {'epa', 'censusNat', 'sectors'} - set(regional)
+    ctr_nat = None
+    if args.contracts_years.is_dir():
+        ctr_nat, regional['contracts'] = contracts_years(args.contracts_years, args.contracts)
+    missing = {'epa', 'censusNat', 'sectors', 'contracts'} - set(regional)
     if missing:
         print(f'Warning: regional.json without {sorted(missing)} (input files missing)')
     rpath = args.out.with_name('regional.json')
@@ -745,6 +891,10 @@ def main() -> None:
         data['benefitRates'] = benefit_rates(args.prd, data)
     else:
         print(f'Warning: {args.prd} not found; no benefits-per-100 chart')
+    if ctr_nat:
+        data['contractYears'] = ctr_nat
+    else:
+        print(f'Warning: {args.contracts_years} not found; no contracts-by-year chart or contracts map')
     out.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'Wrote {out} ({out.stat().st_size / 1024:.0f} KB)')
 

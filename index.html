@@ -444,17 +444,35 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
         <div class="vars">SEPE report p. 53 · Grandes Grupos of the CNO-11 classification</div>
       </article>
 
-      <article class="card span-6" id="ctype-card">
-        <div class="head"><div><h3>Type of contract</h3>
-          <p class="sub">Contracts signed by foreign nationals in 2025, by duration and working time</p></div></div>
-        <div class="legend" id="lg-ctype"></div>
-        <div class="chart" id="c-ctype"></div>
-        <h4 style="margin-top:12px">Temporary and part-time contracts, 2016 → 2025</h4>
-        <p class="sub">Share of foreign nationals' contracts. The 2022 labour reform cut temporary contracts, most of all for men</p>
+      <article class="card span-6" id="ctrend-card">
+        <div class="head"><div><h3>Temporary and part-time contracts, 2016 → 2025</h3>
+          <p class="sub">Foreign nationals' contracts, SEPE's own rates. The 2022 labour reform cut temporary contracts, most of all for men</p></div></div>
         <div class="legend" id="lg-ctrend"></div>
         <div class="chart" id="c-ctrend"></div>
+        <p class="note">SEPE publishes these rates for foreign nationals only. Its part-time rate is lower than the share of part-time contracts below, and the report does not say how it is defined.</p>
+        <details><summary>Show data</summary><div class="table-wrap" id="t-ctrend"></div></details>
+        <div class="vars">SEPE report p. 38 (SISPE, contracts registered 2016–2025)</div>
+      </article>
+      <article class="card span-12" id="ctype-card">
+        <div class="head"><div><h3>Type of contract: foreign vs Spanish nationals</h3>
+          <p class="sub" id="ctype-sub">Contracts signed in 2025, by duration and working time</p></div></div>
+        <div class="sub2">
+          <div>
+            <h4>Duration and working time</h4>
+            <p class="sub">Share of each group's contracts</p>
+            <div class="legend" id="lg-ctype"></div>
+            <div class="chart" id="c-ctype"></div>
+          </div>
+          <div>
+            <h4>Share of contracts that are…</h4>
+            <div class="seg" id="sw-ct-sex" role="group" aria-label="Sex"></div>
+            <div class="legend" id="lg-ctcmp"></div>
+            <div class="chart" id="c-ctcmp"></div>
+          </div>
+        </div>
+        <p class="note" id="ctype-note"></p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-ctype"></div></details>
-        <div class="vars">SEPE report pp. 36–38 · fixed-discontinuous = permanent contracts for seasonal work</div>
+        <div class="vars">Foreign nationals: SEPE report pp. 32 and 37 · all contracts: SEPE Estadística de contratos, Dec 2025 year-to-date, table 2.7A · Spanish = all − foreign · permanent = initial permanent contracts + conversions to permanent · fixed-discontinuous = permanent contracts for seasonal or intermittent work</div>
       </article>
     </div>
   </section>
@@ -1279,33 +1297,50 @@ function renderContracts() {
   groupedBars('#c-grp', grp, { aLabel: 'Foreign nationals', bLabel: 'Spanish nationals', aColor: c.fx, bColor: c.es, fmt: fp, labelW: 250 });
   table('#t-grp', ['Group', 'Foreign nationals', 'Spanish nationals'], grp.map((r) => [r.label, fp(r.a), fp(r.b)]));
 
-  // type of contract
-  const CT = R.contracts_type, ft = css('--seq4'), pt = css('--seq2');
-  const tParts = (d) => [{ label: 'Full time', v: d.full_time, color: ft, ink: inkOn(ft) }, { label: 'Part time', v: d.part_time, color: pt, ink: inkOn(pt) },
-    { label: 'Fixed-discontinuous', v: d.fixed_discontinuous, color: c.eu, ink: inkOn(c.eu) }].filter((p) => p.v > 0);
-  const all = { full_time: CT.permanent.full_time + CT.temporary.full_time, part_time: CT.permanent.part_time + CT.temporary.part_time,
-    fixed_discontinuous: CT.permanent.fixed_discontinuous };
-  legend('#lg-ctype', tParts(all).map((p) => ({ label: p.label, color: p.color, kind: 'box' })));
-  seg100('#c-ctype', [
-    { label: 'All contracts', parts: tParts(all), rate: T.foreign_share_pct, bold: true },
-    { label: 'Permanent', parts: tParts(CT.permanent), rate: CT.permanent.foreign_share_pct, ruleAbove: true },
-    { label: 'Temporary', parts: tParts(CT.temporary), rate: CT.temporary.foreign_share_pct },
-  ], { rowH: 44, labelW: 104, mainTitle: "Foreign nationals' contracts", rate: { title: 'Foreign share', short: 'Foreign share', color: c.fx, fmt: fp, note: 'Foreign nationals\' share of all such contracts' } });
+  // type of contract: foreign vs Spanish nationals
+  const CT = R.contracts_type, CC = R.contracts_compare;
+  const TYPES = [
+    ['permanent_full_time', 'Permanent, full time', css('--seq5')], ['permanent_part_time', 'Permanent, part time', css('--seq3')],
+    ['permanent_fixed_discontinuous', 'Fixed-discontinuous', c.eu],
+    ['temporary_full_time', 'Temporary, full time', css('--in1')], ['temporary_part_time', 'Temporary, part time', css('--in2')],
+  ];
+  $('#ctype-card').hidden = !CC;
+  if (CC) {
+  const pct = (d, k) => 100 * d[k] / d3.sum(TYPES, ([t]) => d[t]);
+  const dParts = (d) => TYPES.map(([k, l, col]) => ({ label: l, v: d[k], color: col, ink: inkOn(col) }));
+  legend('#lg-ctype', TYPES.map(([, l, col]) => ({ label: l, color: col, kind: 'box' })));
+  seg100('#c-ctype', [{ label: 'Foreign nationals', parts: dParts(CC.detail.fx) }, { label: 'Spanish nationals', parts: dParts(CC.detail.es) }],
+    { rowH: 44, labelW: 124 });
+
+  state.ctSex = state.ctSex || 'all';
+  seg('#sw-ct-sex', [['all', 'All'], ['men', 'Men'], ['women', 'Women']], state.ctSex, (v) => { state.ctSex = v; renderContracts(); });
+  const S2 = CC.bySex[state.ctSex];
+  const share = (d, k) => 100 * d[k] / (d.permanent + d.temporary);
+  const RATES = [['temporary', 'Temporary'], ['fixed_discontinuous', 'Fixed-discontinuous'], ['part_time', 'Part time'], ['full_time', 'Full time']];
+  legend('#lg-ctcmp', [{ label: 'Foreign nationals', color: c.fx, kind: 'box' }, { label: 'Spanish nationals', color: c.es, kind: 'box' }]);
+  groupedBars('#c-ctcmp', RATES.map(([k, l]) => ({ label: l, a: share(S2.fx, k), b: share(S2.es, k) })),
+    { aLabel: 'Foreign nationals', bLabel: 'Spanish nationals', aColor: c.fx, bColor: c.es, fmt: fp, labelW: 140 });
+  const A2 = CC.bySex.all;
+  $('#ctype-note').textContent = `Foreign nationals' contracts are less often temporary than Spanish nationals' (${fp(share(A2.fx, 'temporary'))} against ${fp(share(A2.es, 'temporary'))}), `
+    + `mostly because ${fp(share(A2.fx, 'fixed_discontinuous'))} of them are fixed-discontinuous, against ${fp(share(A2.es, 'fixed_discontinuous'))}: permanent contracts for seasonal work, common in farming and hospitality. `
+    + `They are also less often part time (${fp(share(A2.fx, 'part_time'))} against ${fp(share(A2.es, 'part_time'))}). These are contracts signed during the year, not jobs held at one time: a person on short contracts signs many. `
+    + 'Duration and working time are published together only for both sexes.';
+  table('#t-ctype', ['Type of contract', 'Foreign nationals', '% of foreign', 'Spanish nationals', '% of Spanish', 'Foreign share'],
+    TYPES.map(([k, l]) => [l, fmt(CC.detail.fx[k]), fp(pct(CC.detail.fx, k)), fmt(CC.detail.es[k]), fp(pct(CC.detail.es, k)),
+      fp(100 * CC.detail.fx[k] / (CC.detail.fx[k] + CC.detail.es[k]))])
+      .concat(['all', 'men', 'women'].flatMap((sx) => RATES.map(([k, l]) => [`${l} (${sx === 'all' ? 'all' : sx})`, fmt(CC.bySex[sx].fx[k]), fp(share(CC.bySex[sx].fx, k)),
+        fmt(CC.bySex[sx].es[k]), fp(share(CC.bySex[sx].es, k)), fp(100 * CC.bySex[sx].fx[k] / (CC.bySex[sx].fx[k] + CC.bySex[sx].es[k]))]))));
+  }
 
   const TR = R.contracts_trend;
+  const trRows = [['temporary_rate_men', 'Temporary, men'], ['temporary_rate_women', 'Temporary, women'],
+    ['part_time_rate_men', 'Part time, men'], ['part_time_rate_women', 'Part time, women']].map(([k, l]) => ({ label: l, a: TR[k]['2016'], b: TR[k]['2025'] }));
   legend('#lg-ctrend', [{ label: '2016', color: css('--muted'), kind: 'box' }, { label: '2025', color: c.fx, kind: 'box' }]);
-  dumbbell('#c-ctrend', [['temporary_rate_men', 'Temporary, men'], ['temporary_rate_women', 'Temporary, women'],
-    ['part_time_rate_men', 'Part time, men'], ['part_time_rate_women', 'Part time, women']]
-    .map(([k, l]) => ({ label: l, a: TR[k]['2016'], b: TR[k]['2025'] })), {
+  dumbbell('#c-ctrend', trRows, {
     aLabel: '2016', bLabel: '2025', fmt: fpMaybe, tipFmt: fp, max: 100, labelW: 116,
     change: (r) => `${r.b - r.a > 0 ? '+' : ''}${(r.b - r.a).toFixed(1)} pts`,
   });
-  const permTot = CT.permanent.full_time + CT.permanent.part_time + CT.permanent.fixed_discontinuous;
-  table('#t-ctype', ['', 'Full time', 'Part time', 'Fixed-discontinuous', 'Total', 'Foreign share of all such contracts', 'Change on 2024'],
-    [['Permanent', CT.permanent], ['Temporary', CT.temporary]].map(([l, d]) => [l, fmt(d.full_time), fmt(d.part_time), fmt(d.fixed_discontinuous),
-      fmt(d.full_time + d.part_time + d.fixed_discontinuous), fp(d.foreign_share_pct), `+${fp(d.change_pct)}`])
-      .concat([['All', fmt(all.full_time), fmt(all.part_time), fmt(all.fixed_discontinuous), fmt(T.foreign), fp(T.foreign_share_pct), '']],
-        [['Permanent share of foreign contracts', '', '', '', fp(100 * permTot / T.foreign), '', '']]));
+  table('#t-ctrend', ['Rate', '2016', '2025', 'Change'], trRows.map((r) => [r.label, fp(r.a), fp(r.b), `${(r.b - r.a).toFixed(1)} pts`]));
 }
 
 // ======================================================================
@@ -1705,7 +1740,7 @@ document.addEventListener('click', ev => {
 const BASIS = { nat: 'By nationality', birth: 'By country of birth', both: 'By nationality and country of birth' };
 const BASIS_OF = {
   'c-nb-bar': 'both', 'c-pop': 'both', 'c-shares': 'nat', 'c-rates': 'nat', 'c-lev': 'nat', 'c-count': 'nat', 'c-cen': 'birth',
-  'c-pm': 'nat', 'c-rm': 'nat', 'c-sec': 'nat', 'c-occ': 'nat', 'c-grp': 'nat', 'c-ctype': 'nat', 'c-aff': 'nat', 'c-ctry': 'nat',
+  'c-pm': 'nat', 'c-rm': 'nat', 'c-sec': 'nat', 'c-occ': 'nat', 'c-grp': 'nat', 'c-ctype': 'nat', 'c-ctrend': 'nat', 'c-aff': 'nat', 'c-ctry': 'nat',
   'c-sch': 'nat', 'c-ben': 'nat', 'c-ben25': 'nat', 'c-brate': 'nat', 'c-imv': 'nat', 'c-pov': 'nat', 'c-pv': 'nat', 'c-pvaff': 'nat',
   'c-eus': 'birth', 'c-rgi-share': 'both',
 };

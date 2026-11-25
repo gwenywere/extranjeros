@@ -436,6 +436,47 @@ def sepe_report(path: Path) -> dict:
     return out
 
 
+def contracts_compare(path: Path, rep: dict) -> dict:
+    """Contracts by duration and working time, foreign vs Spanish nationals (2025).
+    All contracts from SEPE's contract statistics (table 2.7A); Spanish = all - foreign (SEPE foreign-workers report)."""
+    t = pd.read_csv(path).set_index(['sex', 'row'])
+    W = ['full_time', 'part_time', 'fixed_discontinuous']
+    perm = lambda sex: sum(t.loc[(sex, r), W] for r in ('indefinido', 'indefinido_discapacidad', 'convertidos'))
+    tot = lambda sex: t.loc[(sex, 'total'), W]
+    def check(name, got, want, tol):
+        if abs(got - want) > tol:
+            raise SystemExit(f'{path}: {name} is {got}, expected {want}')
+    CT, T = rep['contracts_type'], rep['contracts_total']['all']
+    check('permanent contracts', int(perm('all').sum()), 6443446, 0)
+    check('total contracts', int(tot('all').sum()), T['foreign'] + T['spanish'], 0)
+    for sex in ('men', 'women'):
+        check(f'men + women, {sex}', int(tot('men').sum() + tot('women').sum()), int(tot('all').sum()), 0)
+    fxp = {w: CT['permanent'][w] for w in W}
+    fxt = {w: CT['temporary'][w] for w in W}
+    check('foreign share of permanent', round(100 * sum(fxp.values()) / perm('all').sum(), 2), CT['permanent']['foreign_share_pct'], 0.01)
+    check('foreign share of temporary', round(100 * sum(fxt.values()) / (tot('all') - perm('all')).sum(), 2), CT['temporary']['foreign_share_pct'], 0.01)
+    out = {'detail': {'fx': {}, 'es': {}}, 'bySex': {}}
+    for w in W:
+        out['detail']['fx'][f'permanent_{w}'] = fxp[w]
+        out['detail']['fx'][f'temporary_{w}'] = fxt[w]
+        out['detail']['es'][f'permanent_{w}'] = int(perm('all')[w]) - fxp[w]
+        out['detail']['es'][f'temporary_{w}'] = int(tot('all')[w] - perm('all')[w]) - fxt[w]
+    check('Spanish contracts', sum(out['detail']['es'].values()), T['spanish'], 0)
+    # by sex: duration and working time are only published separately for foreign nationals
+    SD, SW = rep['contracts_sex_duration'], rep['contracts_sex_worktime']
+    fx_sex = {'all': {'permanent': sum(fxp.values()), 'temporary': sum(fxt.values()), **{w: fxp[w] + fxt[w] for w in W}}}
+    for sex in ('men', 'women'):
+        fx_sex[sex] = {'permanent': SD[sex]['permanent'], 'temporary': SD[sex]['temporary'], **{w: SW[sex][w] for w in W}}
+        check(f'foreign {sex}: duration vs working time', SD[sex]['permanent'] + SD[sex]['temporary'], sum(SW[sex][w] for w in W), 0)
+    for w in W + ['permanent']:
+        check(f'foreign men + women, {w}', fx_sex['men'][w] + fx_sex['women'][w], fx_sex['all'][w], 0)
+    for sex in ('all', 'men', 'women'):
+        allc = {'permanent': int(perm(sex).sum()), 'temporary': int((tot(sex) - perm(sex)).sum()), **{w: int(tot(sex)[w]) for w in W}}
+        f = fx_sex[sex]
+        out['bySex'][sex] = {'fx': f, 'es': {k: allc[k] - f[k] for k in allc}}
+    return out
+
+
 def build(series_file: Path, snapshot_file: Path, eustat_csv: Path | None = None) -> dict:
     rd = lambda sheet: pd.read_excel(series_file, sheet_name=sheet)
     d: dict = {'generated': date.today().isoformat()}
@@ -590,6 +631,8 @@ def main() -> None:
                     help='Households and persons by nationality of members (ECEPOV 2021, INE table 56556)')
     ap.add_argument('--households', type=Path, default=Path('data/ine_60135_hogares_total.csv'),
                     help='Total households, quarterly (Estadística Continua de Población, INE table 60135)')
+    ap.add_argument('--contracts-all', type=Path, default=Path('data/sepe_contratos_2025_jornada.csv'),
+                    help='All contracts in 2025 by working time and sex (SEPE contract statistics, table 2.7A)')
     ap.add_argument('--prd', type=Path, default=Path('data/mites_prd1_beneficiarios_2013_2024.csv'),
                     help='All unemployment-benefit recipients by year (Anuario de Estadísticas, table PRD-1)')
     ap.add_argument('--sectors', type=Path, default=Path('data/ine_69964_censo_ocupados_actividad_nacionalidad.px'),
@@ -623,6 +666,10 @@ def main() -> None:
     data = build(args.series_file, args.snapshot_file, eustat)
     if args.sepe_report.exists():
         data['snapshots']['sepeReport'] = sepe_report(args.sepe_report)
+        if args.contracts_all.exists():
+            data['snapshots']['sepeReport']['contracts_compare'] = contracts_compare(args.contracts_all, data['snapshots']['sepeReport'])
+        else:
+            print(f'Warning: {args.contracts_all} not found; contract types without the Spanish comparison')
     else:
         print(f'Warning: {args.sepe_report} not found; no contracts/occupations or scheme-by-sex charts')
     if all(p.exists() for p in (args.rgi_origin, args.census, args.census_nat)):

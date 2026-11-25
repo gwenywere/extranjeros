@@ -327,9 +327,9 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
         <details class="why" id="epa-vs-census"><summary>Why these numbers differ from the EPA charts above</summary>
           <ul>
             <li><b>Registers, not a survey.</b> "In work" here means registered with Social Security or in tax records, so informal work is not counted. "Unemployed" means registered as a job seeker at an employment office. The EPA asks people what they did, so it counts both.</li>
-            <li><b>Unregistered job seekers count as inactive.</b> That is why the activity and unemployment rates here are lower than the EPA's (on 1 January 2024: 55% of people born abroad were active and 13% of those were unemployed; in the EPA for 2024 Q1, 69% and 19% of foreign nationals).</li>
+            <li><b>Unregistered job seekers count as inactive.</b> That is why the activity and unemployment rates here are lower than the EPA's (on 1 Jan 2024: 55% of people born abroad were active and 13% of those were unemployed; in the EPA for 2024 Q1, 69% and 19% of foreign nationals).</li>
             <li><b>Country of birth, not nationality.</b> Born abroad includes people who have become Spanish, many of them older or retired. Foreign nationals include children of immigrants born in Spain. The two groups are about the same size but are not the same people.</li>
-            <li><b>One day, not a quarter.</b> The census is a snapshot on 1 January; the EPA is a quarterly estimate.</li>
+            <li><b>One day, not a quarter.</b> The census is a snapshot on 1 Jan; the EPA is a quarterly estimate.</li>
             <li><b>Which to use:</b> the EPA for unemployment rates and change over time; the census to compare countries of birth and provinces, where the EPA sample is too small.</li>
           </ul>
         </details>
@@ -398,7 +398,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
           </div>
         </div>
         <div class="chart" id="c-sec"><div class="empty">Loading…</div></div>
-        <p class="note">From the census: people in work on 1 January, by the section of activity (CNAE) of their job, taken from Social Security and tax registers, so informal work is not counted. The dark mark on each share bar is foreign nationals' share of all workers; shares are not shown for sectors with fewer than 500 workers in the selected place.</p>
+        <p class="note">From the census: people in work on 1 Jan, by the section of activity (CNAE) of their job, taken from Social Security and tax registers, so informal work is not counted. The dark mark on each share bar is foreign nationals' share of all workers; shares are not shown for sectors with fewer than 500 workers in the selected place.</p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-sec"></div></details>
         <div class="vars">INE · Censo anual de población · table 69964 · employed 16+ by nationality and economic activity (CNAE-2009 sections)</div>
       </article>
@@ -472,7 +472,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
       </article>
 
       <article class="card span-12" id="scheme-card">
-        <div class="head"><div><h3>Who the foreign affiliates are, 31 December 2025</h3>
+        <div class="head"><div><h3>Who the foreign affiliates are, 31 Dec 2025</h3>
           <p class="sub" id="sch-sub">Foreign nationals registered with Social Security, by scheme, sex, nationality, type of work and age</p></div></div>
         <div class="sub2">
           <div>
@@ -516,10 +516,10 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
         <div class="chart" id="c-ben"></div>
         <p class="note"><b>Contributory</b>: for people who lost a job after paying contributions for at least a year; paid for up to two years, based on past wages. <b>Unemployment subsidies</b> (SEPE's assistance level): a flat, means-tested payment for people whose contributory benefit has run out or who did not contribute long enough; includes the farm-worker subsidies in Andalusia and Extremadura. <b>RAI</b>: a means-tested income with job-search help for groups who find work hard: long-term unemployed over 45, people with disabilities, victims of gender violence, returning emigrants. <b>Employment Activation Programme</b>: a temporary payment with job-search support for long-term unemployed people with family responsibilities who had no other benefit, 2015–2020.</p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-ben"></div></details>
-        <div class="vars">Ministerio de Trabajo · Anuario de Estadísticas PEX-1 (SEPE) · 2020 includes furlough (ERTE) effects</div>
+        <div class="vars">Ministerio de Trabajo · Anuario de Estadísticas PEX-1 (SEPE) · share = foreign ÷ all recipients (PRD-1) · 2020 includes furlough (ERTE) effects</div>
       </article>
       <article class="card span-5">
-        <div class="head"><div><h3>On 31 December 2025</h3><p class="sub" id="ben25-sub">Foreign recipients of unemployment benefits, by type</p></div></div>
+        <div class="head"><div><h3>On 31 Dec 2025</h3><p class="sub" id="ben25-sub">Foreign recipients of unemployment benefits, by type</p></div></div>
         <div class="chart" id="c-ben25"></div>
         <p class="note">A count on one day, so not directly comparable with the annual averages on the left.</p>
         <div class="vars">SEPE · Informe del Mercado de Trabajo de las Personas Extranjeras 2026</div>
@@ -536,11 +536,15 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
         <div class="vars">Recipients: Ministerio de Trabajo, Anuario de Estadísticas, tables PRD-1 (all) and PEX-1 (foreign); Spanish = all − foreign · people in work, labour force, unemployed and aged 16+: INE EPA, average of the four quarters</div>
       </article>
       <article class="card span-12">
-        <div class="head"><div><h3>Minimum Living Income (IMV) recipients</h3><p class="sub">Household heads receiving the IMV, by nationality. Other household members are not broken down</p></div></div>
+        <div class="head">
+          <div><h3 id="imv-title">Minimum Living Income (IMV) recipients</h3><p class="sub" id="imv-sub"></p></div>
+          <div class="seg" id="sw-imv" role="group" aria-label="Measure"></div>
+        </div>
         <div class="legend" id="lg-imv"></div>
         <div class="chart" id="c-imv"></div>
+        <p class="note" id="imv-note"></p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-imv"></div></details>
-        <div class="vars">Seguridad Social (INSS) · transparency request published by Maldita.es</div>
+        <div class="vars">IMV: Seguridad Social (INSS), transparency request published by Maldita.es · residents: INE Estadística Continua de Población · households: INE ECP table 60135 (total) and ECEPOV 2021 table 56556 (household size by nationality)</div>
       </article>
     </div>
   </section>
@@ -637,13 +641,13 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
     <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=65309" target="_blank" rel="noopener noreferrer">INE, Encuesta de Población Activa (EPA)</a>, tables 65290, 65299, 65300, 65309 and 65336: activity, employment and unemployment by nationality, Spain and Basque Country, quarterly 2002–2026. Survey estimates with sampling error.</li>
     <li><a href="https://w6.seg-social.es/PXWeb/pxweb/es/Afiliados%20en%20alta%20laboral/" target="_blank" rel="noopener noreferrer">Seguridad Social, PX-Web</a>: average affiliates (foreigners by sex, region, scheme, EU / non-EU; total system), monthly from 2012; affiliates by nationality on the last day of the month.</li>
     <li><a href="https://www.mites.gob.es/es/estadisticas/anuarios/index.htm" target="_blank" rel="noopener noreferrer">Ministerio de Trabajo, Anuario de Estadísticas</a>, table PEX-1 (SEPE data): foreign recipients of unemployment benefits, annual averages 2013–2024. The Employment Activation Programme existed only in 2015–2020. Table PRD-1: all recipients, used to get Spanish recipients (all − foreign); typed into <code>data/mites_prd1_beneficiarios_2013_2024.csv</code>.</li>
-    <li><a href="https://maldita.es/prebunking/20260710/ingreso-minimo-vital-espa%C3%B1oles-extranjeros/" target="_blank" rel="noopener noreferrer">Seguridad Social (INSS), via Maldita.es</a>: IMV recipients by nationality, monthly June 2020 – June 2026 (data released on a transparency request).</li>
+    <li><a href="https://maldita.es/prebunking/20260710/ingreso-minimo-vital-espa%C3%B1oles-extranjeros/" target="_blank" rel="noopener noreferrer">Seguridad Social (INSS), via Maldita.es</a>: IMV recipients by nationality, monthly June 2020 – June 2026 (data released on a transparency request). Per 100 households: households by nationality estimated from residents (Estadística Continua de Población), average household size of all-Spanish and all-foreign households (<a href="https://www.ine.es/jaxiPx/Tabla.htm?tpx=56556" target="_blank" rel="noopener noreferrer">ECEPOV 2021, table 56556</a>) and total households (<a href="https://www.ine.es/jaxiT3/Tabla.htm?t=60135" target="_blank" rel="noopener noreferrer">ECP table 60135</a>), from Jan 2021.</li>
     <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=60258" target="_blank" rel="noopener noreferrer">INE, Encuesta de Condiciones de Vida</a>, tables 60258 and 10009: AROPE and its components by nationality, 2008–2025. AROPE follows the "Europa 2030" definition from 2014; before that only the earlier "Europa 2020" definition exists (dotted line).</li>
-    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=82104" target="_blank" rel="noopener noreferrer">INE, Estadística Continua de Población</a> and <a href="https://www.ine.es/dyngs/Prensa/ECP3T26.htm" target="_blank" rel="noopener noreferrer">press release of 1 October 2026</a>: population by nationality and by place of birth (2026 provisional). Half-yearly to 2020, quarterly since 2021.</li>
-    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67129&amp;L=0" target="_blank" rel="noopener noreferrer">INE, Censo anual de población, table 67129</a>: population 16+ by region and province, sex, country of birth (17 countries and the rest of each continent) and relation to activity, 1 January 2021–2024. Work status comes from Social Security and employment-office registers.</li>
+    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=82104" target="_blank" rel="noopener noreferrer">INE, Estadística Continua de Población</a> and <a href="https://www.ine.es/dyngs/Prensa/ECP3T26.htm" target="_blank" rel="noopener noreferrer">press release of 1 Oct 2026</a>: population by nationality and by place of birth (2026 provisional). Half-yearly to 2020, quarterly since 2021.</li>
+    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67129&amp;L=0" target="_blank" rel="noopener noreferrer">INE, Censo anual de población, table 67129</a>: population 16+ by region and province, sex, country of birth (17 countries and the rest of each continent) and relation to activity, 1 Jan 2021–2024. Work status comes from Social Security and employment-office registers.</li>
     <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=65290" target="_blank" rel="noopener noreferrer">INE, EPA by region and nationality</a>, tables 65290 (population 16+), 65299 (active) and 65309 (employed): annual averages for the region map. <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67130" target="_blank" rel="noopener noreferrer">INE census table 67130</a>: population 16+ by nationality and relation to activity, by province, 2021–2024, for the province map. <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=69964&amp;L=0" target="_blank" rel="noopener noreferrer">INE census table 69964</a>: employed people by nationality and economic section, by province, 2021–2024. Province shapes simplified from <a href="https://gadm.org" target="_blank" rel="noopener noreferrer">GADM</a>.</li>
-    <li><a href="https://www.sepe.es/dctm/informes%3A09019af48026a2c4/RElTRVdFQg%3D%3D/4832-1.pdf" target="_blank" rel="noopener noreferrer">SEPE, Informe del Mercado de Trabajo de las Personas Extranjeras 2026</a> (2025 data): registered unemployment and benefit recipients on 31 December 2025; foreign affiliates by scheme, sex, nationality, type of work, age and contract (Seguridad Social, 31 Dec 2025); contracts by type, working time and occupation (SISPE, all of 2025). The report publishes these only in the PDF; the figures were read from it page by page and checked against its own totals (see <code>data/sepe_informe_extranjeros_2025.README.txt</code>).</li>
-    <li><a href="https://www.eustat.eus/elementos/tbl0021467_c.html" target="_blank" rel="noopener noreferrer">Eustat</a> (table tbl0021467, census of population): population 16+ by activity and continent of birth, by province and sex, Basque Country, 1 January 2025.</li>
+    <li><a href="https://www.sepe.es/dctm/informes%3A09019af48026a2c4/RElTRVdFQg%3D%3D/4832-1.pdf" target="_blank" rel="noopener noreferrer">SEPE, Informe del Mercado de Trabajo de las Personas Extranjeras 2026</a> (2025 data): registered unemployment and benefit recipients on 31 Dec 2025; foreign affiliates by scheme, sex, nationality, type of work, age and contract (Seguridad Social, 31 Dec 2025); contracts by type, working time and occupation (SISPE, all of 2025). The report publishes these only in the PDF; the figures were read from it page by page and checked against its own totals (see <code>data/sepe_informe_extranjeros_2025.README.txt</code>).</li>
+    <li><a href="https://www.eustat.eus/elementos/tbl0021467_c.html" target="_blank" rel="noopener noreferrer">Eustat</a> (table tbl0021467, census of population): population 16+ by activity and continent of birth, by province and sex, Basque Country, 1 Jan 2025.</li>
     <li><a href="https://bibliovirtual.inclusion.gob.es/documents/d/asset-library-6602793/indicadores_marco-estrategico-ii" target="_blank" rel="noopener noreferrer">Ministerio de Inclusión, indicadores del Marco Estratégico II</a>: Basque minimum income (RGI) 2024; IMV recipients December 2025.</li>
     <li><a href="https://opendata.euskadi.eus/contenidos/estadistica/estadisticas_ebpgi2023/opendata/2023_Estadistica-de-Personas-Beneficiarias-de-Prestaciones-de-Garantia-de-Ingresos-en-Euskadi.xlsx" target="_blank" rel="noopener noreferrer">Lanbide / Gobierno Vasco, Estadística de personas beneficiarias de prestaciones de garantía de ingresos 2023</a>: RGI holders. The open tables have no nationality or birthplace; those figures are as reported by <a href="https://www.gasteizhoy.com/cuantos-perceptores-rgi-son-extranjeros/" target="_blank" rel="noopener noreferrer">Gasteiz Hoy</a> (27 Aug 2024), and its totals, sex and territory figures match the official tables. Adults by nationality: <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67130&amp;L=0" target="_blank" rel="noopener noreferrer">INE census table 67130</a>.</li>
   </ul>
@@ -1045,7 +1049,7 @@ function tableSeries(id, series, f, firstHead = 'Date') {
 }
 
 // ---------- state ----------
-const state = { brate: 'employed', rate: 'unempRate', rateG: 'nat', lev: 'employed', aff: 'scheme', pov: 'arope', pv: 'smooth', eusSex: 'all', eusTerr: 'pv',
+const state = { imv: 'hh', brate: 'employed', rate: 'unempRate', rateG: 'nat', lev: 'employed', aff: 'scheme', pov: 'arope', pv: 'smooth', eusSex: 'all', eusTerr: 'pv',
   cenView: 'cont', cenSex: 'all', cenYear: null, cenRegion: 0, cenInact: 'split', cenSort: 'size' };
 let CEN = null; // census.json (INE 67129), loaded after data.json
 
@@ -1122,7 +1126,7 @@ function renderCensus() {
   if (rows.length) rows[0][2] = { ruleAbove: true };
   groups = groups.concat(rows);
   const R = CEN.regions[ri], sexName = { all: '', men: ', men', women: ', women' }[state.cenSex];
-  $('#cen-sub').textContent = `${niceName(R.name)}${sexName}, population aged 16+ on 1 January ${CEN.years[yi]}. `
+  $('#cen-sub').textContent = `${niceName(R.name)}${sexName}, population aged 16+ on 1 Jan ${CEN.years[yi]}. `
     + `${state.cenView === 'cont' ? 'Continents' : 'Countries'} ordered by ${SORTS[state.cenSort][1]}, highest first`
     + (hidden ? `; ${hidden} group${hidden > 1 ? 's' : ''} with under ${fmt(MIN)} people not shown` : '');
   seg('#sw-cen-inact', [['split', 'Inactive by type'], ['combined', 'Inactive combined']], state.cenInact, (v) => { state.cenInact = v; renderCensus(); });
@@ -1465,7 +1469,7 @@ function renderProvMap() {
   const color = seqColor(d3.extent(vals));
   const sexName = { all: '', men: ', men', women: ', women' }[state.pmSex];
   $('#pm-title').textContent = `By province: ${METRIC[state.pmMetric].toLowerCase()}, ${groupLabel[0].toLowerCase()}${groupLabel.slice(1)}`;
-  $('#pm-sub').textContent = `People aged 16+ on 1 January ${CEN.years[yi]}${sexName}. `
+  $('#pm-sub').textContent = `People aged 16+ on 1 Jan ${CEN.years[yi]}${sexName}. `
     + { share: `${groupLabel} as a share of all adults in each province`, unemp: 'Unemployed ÷ (in work + unemployed)', work: 'In work as a share of all adults in the group' }[state.pmMetric];
   drawMap('#c-pm', {
     value: (code) => (rows.has(code) ? metric(rows.get(code)) : null),
@@ -1642,7 +1646,7 @@ function renderSectors() {
     .filter((r) => r.code !== 'total' && r.code !== 'X' && tot[r.i] > 0);
   rows.sort((p, q) => (state.secSort === 'count' ? q.a - p.a : (q.b ?? -1) - (p.b ?? -1)));
   const place = niceName(CEN.regions[state.secRegion].name), sexName = { all: '', men: ', men', women: ', women' }[state.secSex];
-  $('#sec-sub').textContent = `${place}${sexName}, people in work on 1 January ${S.years[yi]}: ${fmt(fx[0])} foreign nationals, ${fp(share(0))} of all workers`;
+  $('#sec-sub').textContent = `${place}${sexName}, people in work on 1 Jan ${S.years[yi]}: ${fmt(fx[0])} foreign nationals, ${fp(share(0))} of all workers`;
   const chg = (i) => (fx0[i] ? `${fx[i] >= fx0[i] ? '+' : ''}${(100 * (fx[i] / fx0[i] - 1)).toFixed(0)}%` : '–');
   twoColBars('#c-sec', rows, {
     aTitle: 'Foreign nationals in work', bTitle: 'Foreign share of the sector', aColor: c.fx, bColor: c.fx,
@@ -1718,7 +1722,7 @@ function renderAll() {
     ser(E, pop16share, 'Population aged 16+', c.total, { short: 'Population 16+', width: 1, dash: true }),
     ser(E, unempShare, 'Unemployed (EPA)', c.eu, { short: 'Unemployed' }),
     ser(A, A.share, 'Social Security affiliates', c.fx, { short: 'SS affiliates', width: 2.5 }),
-    ser(B, B.share, 'Unemployment-benefit recipients', c.es, { short: 'Benefit recipients', markers: true }),
+    ser(B, D.benefitRates ? D.benefitRates.share : B.share, 'Unemployment-benefit recipients', c.es, { short: 'Benefit recipients', markers: true }),
     ser(I, I.share, 'IMV recipients (households)', c.neu, { short: 'IMV recipients' }),
   ];
   legend('#lg-shares', [{ label: 'Population aged 16+ (grey area)', kind: 'area' }, ...shareS.slice(1)]);
@@ -1821,9 +1825,10 @@ function renderAll() {
     { label: 'Employment Activation Programme', color: c.neu, vals: B.pae },
   ];
   legend('#lg-ben', benL.map((L) => ({ ...L, kind: 'box' })));
-  barStack('#c-ben', { cats: yrs, layers: benL, height: 300, top: (i) => fp(B.share[i]), tipExtra: (i) => row('Share of all recipients', fp(B.share[i])) });
+  const benShare = D.benefitRates ? D.benefitRates.share : B.share; // foreign ÷ all recipients (PRD-1), unrounded
+  barStack('#c-ben', { cats: yrs, layers: benL, height: 300, top: (i) => fp(benShare[i]), tipExtra: (i) => row('Share of all recipients', fp(benShare[i])) });
   table('#t-ben', ['Year', ...benL.map((L) => L.label), 'Total foreign', '% of all recipients'],
-    yrs.map((y, i) => [y, ...benL.map((L) => (L.vals[i] == null ? null : fmt(L.vals[i]))), fmt(B.fx[i]), fp(B.share[i])]).reverse());
+    yrs.map((y, i) => [y, ...benL.map((L) => (L.vals[i] == null ? null : fmt(L.vals[i]))), fmt(B.fx[i]), fp(benShare[i])]).reverse());
 
   const b25 = S.benefitsDec2025;
   $('#ben25-sub').textContent = `Foreign recipients of unemployment benefits, by type: ${fmt(b25.contributory + b25.subsidy + b25.rai + b25.agrarian)} in all`;
@@ -1864,15 +1869,45 @@ function renderAll() {
       BR.t.map((k, i) => [k.slice(0, 4), fmt(BR.recipients.es[i]), fmt(den.es[i]), f1(per('es')[i]), fmt(BR.recipients.fx[i]), fmt(den.fx[i]), f1(per('fx')[i])]).reverse());
   }
 
-  const imvL = [
-    { label: 'Spanish', color: c.es, vals: I.es },
-    { label: 'Foreign', color: c.fx, vals: I.fx },
-  ];
-  legend('#lg-imv', [...imvL].reverse().map((L) => ({ ...L, kind: 'box' })));
-  stackChart('#c-imv', { t: I.t, freq: 'M', layers: imvL, fmt: fk, height: 280, bands: false, labelW: 120, totalLabel: 'All recipients',
-    tipExtra: (i) => row('Foreign share', fp(I.share[i])) });
-  tableSeries('#t-imv', [ser(I, I.es, 'Spanish', c.es), ser(I, I.fx, 'Foreign', c.fx), ser(I, I.share, 'Foreign share', c.fx)],
-    (v) => (v < 100 ? fp(v) : fmt(v)), 'Month');
+  const IR = D.imvRates;
+  const IMVV = { count: 'Recipients', hh: 'Per 100 households', res: 'Per 100 residents' };
+  if (!IR && state.imv !== 'count') state.imv = 'count';
+  seg('#sw-imv', Object.entries(IMVV).filter(([k]) => IR || k === 'count'), state.imv, (v) => { state.imv = v; renderAll(); });
+  if (state.imv === 'count') {
+    $('#imv-title').textContent = 'Minimum Living Income (IMV) recipients';
+    $('#imv-sub').textContent = 'Household heads receiving the IMV, by nationality. Other household members are not broken down';
+    $('#imv-note').textContent = 'Each recipient claims for a whole household. Foreign nationals need at least one year of legal residence to qualify.';
+    const imvL = [
+      { label: 'Spanish', color: c.es, vals: I.es },
+      { label: 'Foreign', color: c.fx, vals: I.fx },
+    ];
+    legend('#lg-imv', [...imvL].reverse().map((L) => ({ ...L, kind: 'box' })));
+    stackChart('#c-imv', { t: I.t, freq: 'M', layers: imvL, fmt: fk, height: 280, bands: false, labelW: 120, totalLabel: 'All recipients',
+      tipExtra: (i) => row('Foreign share', fp(I.share[i])) });
+    tableSeries('#t-imv', [ser(I, I.es, 'Spanish', c.es), ser(I, I.fx, 'Foreign', c.fx), ser(I, I.share, 'Foreign share', c.fx)],
+      (v) => (v < 100 ? fp(v) : fmt(v)), 'Month');
+  } else {
+    const base = state.imv === 'hh' ? IR.households : IR.residents, what = state.imv === 'hh' ? 'households' : 'residents';
+    const imvOf = (g) => IR.t.map((k) => I[g][I.t.indexOf(k)]);
+    const rate = (g) => imvOf(g).map((v, i) => 100 * v / base[g][i]);
+    const f2 = (v) => v.toFixed(2);
+    const imS = [ser(IR, rate('es'), 'Spanish', c.es, { width: 2.5 }), ser(IR, rate('fx'), 'Foreign', c.fx, { width: 2.5 })];
+    const n = IR.t.length - 1, es = rate('es')[n], fx = rate('fx')[n];
+    $('#imv-title').textContent = `IMV recipients for every 100 ${what}`;
+    $('#imv-sub').textContent = `${state.imv === 'hh' ? 'Households' : 'Residents of all ages'} of the same nationality. ${dateLabel('M', IR.t[n])}: ${f2(fx)} foreign and ${f2(es)} Spanish, ${(fx / es).toFixed(1)} times as many`;
+    $('#imv-note').textContent = state.imv === 'hh'
+      ? `There is no count of households by nationality after 2021, so it is estimated: residents ÷ average household size (${IR.size.es.toFixed(2)} people in all-Spanish and ${IR.size.fx.toFixed(2)} in all-foreign households, ECEPOV 2021), scaled to INE's total number of households. Mixed households are shared out by the same rule. Foreign residents include people who do not yet have the year of legal residence the IMV requires.`
+      : 'Official counts only, no estimate. Each recipient claims for a whole household, so the rate per resident is lower than per household. Foreign residents include people who do not yet have the year of legal residence the IMV requires.';
+    legend('#lg-imv', imS);
+    timeChart('#c-imv', { series: imS, fmt: f2, axisFmt: (v) => String(+v.toFixed(1)), zero: true, height: 280, labelW: 120, bands: false,
+      tipExtra: (p) => {
+        const i = IR.t.indexOf(p.k);
+        return `<div class="t" style="margin-top:6px">Recipients / ${what}</div>`
+          + row('Spanish', `${fmt(imvOf('es')[i])} / ${fmt(base.es[i])}`, c.es) + row('Foreign', `${fmt(imvOf('fx')[i])} / ${fmt(base.fx[i])}`, c.fx);
+      } });
+    table('#t-imv', ['Month', 'Spanish recipients', `Spanish ${what}`, 'Spanish per 100', 'Foreign recipients', `Foreign ${what}`, 'Foreign per 100'],
+      IR.t.map((k, i) => [dateLabel('M', k), fmt(imvOf('es')[i]), fmt(base.es[i]), f2(rate('es')[i]), fmt(imvOf('fx')[i]), fmt(base.fx[i]), f2(rate('fx')[i])]).reverse());
+  }
 
   // --- poverty ---
   const POV = {
@@ -2003,7 +2038,7 @@ function renderAll() {
     const totH = N.es.holders + N.fx.holders;
     $('#rgi-foot').textContent = `In ${RX.year}, ${fmt(totH)} people held the RGI at some point, ${fmt(N.fx.holders)} of them foreign nationals `
       + `(${fp(100 * N.fx.holders / totH)}). Each holder claims for a household: 61% of holders lived alone, and children and other household members `
-      + 'are not counted here. The 2023 rates divide holders at any point in the year by adults on 1 January. By place of birth, naturalised immigrants count as born abroad.';
+      + 'are not counted here. The 2023 rates divide holders at any point in the year by adults on 1 Jan. By place of birth, naturalised immigrants count as born abroad.';
     const r1 = (v) => v.toFixed(1);
     table('#t-rgi', ['Group', 'Year', 'RGI holders', 'Adults 16+', 'Per 100 adults', 'Source'], [
       ['Spanish nationals (coverage)', 2024, '', '', fp(rg.coverageSpanish), 'Ministerio de Inclusión'],

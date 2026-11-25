@@ -26,6 +26,7 @@ import re
 from datetime import date
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 COUNTRY_EN = {
@@ -494,6 +495,44 @@ def build(series_file: Path, snapshot_file: Path, eustat_csv: Path | None = None
     return d
 
 
+def imv_rates(ecepov: Path, households: Path, data: dict) -> dict:
+    """Households and residents by nationality at each IMV month, from 2021.
+    Households of each nationality are estimated as residents / average household size (all-Spanish and all-foreign
+    households, ECEPOV 2021), then scaled so the two add up to INE's total households (ECP) on that date."""
+    ec = pd.read_csv(ecepov).set_index('composition')
+    if ec.loc[['spanish_only', 'mixed', 'foreign_only']].sum().sub(ec.loc['total']).abs().max() > 10:
+        raise SystemExit(f'{ecepov}: household compositions do not add up to the total')
+    size = {'es': ec.loc['spanish_only', 'persons'] / ec.loc['spanish_only', 'households'],
+            'fx': ec.loc['foreign_only', 'persons'] / ec.loc['foreign_only', 'households']}
+    hh = pd.read_csv(households, parse_dates=['date']).set_index('date')['households']
+    P, I = data['population'], data['imv']
+    pop = pd.DataFrame({'es': P['esNat'], 'fx': P['fxNat']}, index=pd.to_datetime(P['t']))
+
+    def at(series, when):  # linear interpolation between the two surrounding dates
+        s = series.dropna()
+        if when < s.index[0] or when > s.index[-1]:
+            return None
+        secs = lambda ts: (pd.DatetimeIndex(ts) - pd.Timestamp('1970-01-01')).total_seconds()
+        return float(np.interp(secs([when])[0], secs(s.index), s.values))
+
+    out = {'freq': 'M', 't': [], 'households': {'es': [], 'fx': []}, 'residents': {'es': [], 'fx': []},
+           'size': {k: round(v, 3) for k, v in size.items()}}
+    for k, es_imv, fx_imv in zip(I['t'], I['es'], I['fx']):
+        when = pd.Timestamp(k)
+        tot, pes, pfx = at(hh, when), at(pop['es'], when), at(pop['fx'], when)
+        if None in (tot, pes, pfx) or es_imv is None or fx_imv is None:
+            continue
+        raw = {'es': pes / size['es'], 'fx': pfx / size['fx']}
+        scale = tot / (raw['es'] + raw['fx'])
+        if not 0.9 < scale < 1.05:
+            raise SystemExit(f'{k}: estimated households are {1 / scale:.2f} x INE total; check the inputs')
+        out['t'].append(k)
+        for g in ('es', 'fx'):
+            out['households'][g].append(round(raw[g] * scale))
+            out['residents'][g].append(round(pes if g == 'es' else pfx))
+    return out
+
+
 def benefit_rates(path: Path, data: dict) -> dict:
     """All unemployment-benefit recipients (yearbook PRD-1) minus foreign ones (PEX-1) = Spanish nationals,
     each per 100 people in work, in the labour force, unemployed and aged 16+ (EPA annual averages)."""
@@ -547,6 +586,10 @@ def main() -> None:
     ap.add_argument('--epa-pop', type=Path, default=Path('data/ine_65290_epa_poblacion16_nacionalidad_ccaa.px'))
     ap.add_argument('--epa-active', type=Path, default=Path('data/ine_65299_epa_activos_nacionalidad_ccaa.px'))
     ap.add_argument('--epa-employed', type=Path, default=Path('data/ine_65309_epa_ocupados_nacionalidad_ccaa.px'))
+    ap.add_argument('--ecepov', type=Path, default=Path('data/ine_56556_ecepov2021_hogares_nacionalidad.csv'),
+                    help='Households and persons by nationality of members (ECEPOV 2021, INE table 56556)')
+    ap.add_argument('--households', type=Path, default=Path('data/ine_60135_hogares_total.csv'),
+                    help='Total households, quarterly (Estadística Continua de Población, INE table 60135)')
     ap.add_argument('--prd', type=Path, default=Path('data/mites_prd1_beneficiarios_2013_2024.csv'),
                     help='All unemployment-benefit recipients by year (Anuario de Estadísticas, table PRD-1)')
     ap.add_argument('--sectors', type=Path, default=Path('data/ine_69964_censo_ocupados_actividad_nacionalidad.px'),
@@ -586,6 +629,10 @@ def main() -> None:
         data['snapshots']['rgiContext'] = rgi_context(args.rgi_origin, args.census, args.census_nat)
     else:
         print('Warning: RGI context skipped (needs --rgi-origin, --census and --census-nat files)')
+    if args.ecepov.exists() and args.households.exists():
+        data['imvRates'] = imv_rates(args.ecepov, args.households, data)
+    else:
+        print('Warning: IMV per-household rates skipped (needs --ecepov and --households files)')
     if args.prd.exists():
         data['benefitRates'] = benefit_rates(args.prd, data)
     else:

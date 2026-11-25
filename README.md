@@ -13,7 +13,7 @@ Same design as the Nacimientos pages in `../site/` (plain HTML + [D3](https://d3
 - **Sectors**: employed foreign nationals by economic section (CNAE) and their share of each sector's workforce, by region or province, sex and year (census 2021–2024)
 - **Contracts and occupations, 2025** (from SEPE's annual report): the 10 occupations with most contracts for foreign nationals and their share of each occupation's contracts; contracts by broad occupational group, foreign vs Spanish; contract type and working time; temporary and part-time contracts 2016 → 2025
 - **Social Security**: foreign affiliates by scheme, EU / non-EU or sex; the 15 largest nationalities, 2012 → 2026
-- **Benefits**: foreign unemployment-benefit recipients by type 2013–2024 and on 31 Dec 2025; recipients for every 100 people in work, in the labour force, unemployed or aged 16+, Spanish vs foreign nationals; IMV recipients by nationality
+- **Benefits**: foreign unemployment-benefit recipients by type 2013–2024 and on 31 Dec 2025; recipients for every 100 people in work, in the labour force, unemployed or aged 16+, Spanish vs foreign nationals; IMV recipients by nationality, as counts or per 100 households or residents
 - **Poverty** (ECV): AROPE, poverty risk, severe deprivation and low work intensity by nationality
 - **Basque Country**: unemployment rate (4-quarter average or quarterly), foreign affiliates, work status by continent of birth with sex and province switches (Eustat), RGI coverage
 
@@ -48,6 +48,8 @@ The RGI card also uses INE census table 67130 (adults by nationality, `data/ine_
 The contracts card and the "who the foreign affiliates are" card use figures from SEPE's 2025 report on foreign workers (`4832-1.pdf`), which publishes them only in the PDF. They are typed into `data/sepe_informe_extranjeros_2025.csv` with the page of each figure (option `--sepe-report`); the build stops if they don't add up to the report's own totals. `data/sepe_informe_extranjeros_2025.README.txt` lists the checks.
 
 The benefits-per-100 card needs all recipients each year (Spanish = all − foreign). They come from table PRD-1 of the Ministry of Labour's Anuario de Estadísticas (<https://www.mites.gob.es/es/estadisticas/anuarios/index.htm>, chapter PRD), typed into `data/mites_prd1_beneficiarios_2013_2024.csv` (option `--prd`). The build stops if a year's levels don't add up to its total, or if the total and the foreign count don't give the foreign share in table PEX-1 (to within 0.2 points). Each yearbook has the current and the previous year, so add a row when a new one comes out. The denominators are EPA annual averages (mean of the four quarters).
+
+The IMV card's per-100-households view needs households by nationality, which INE no longer publishes. They are estimated each month from 2021: residents of each nationality ÷ the average size of all-Spanish and all-foreign households in ECEPOV 2021 (`data/ine_56556_ecepov2021_hogares_nacionalidad.csv`, option `--ecepov`), scaled so both add up to INE's total households (`data/ine_60135_hogares_total.csv`, option `--households`; see the README.txt next to them). The build stops if the estimate is more than 10% off INE's total before scaling.
 
 `regional.json` is built from INE tables 65290, 65299, 65309 (EPA by region), 67130 (census by nationality) and 69964 (census employment by sector), all in `data/` (options `--epa-pop`, `--epa-active`, `--epa-employed`, `--census-nat`, `--sectors`). Download newer versions from `https://www.ine.es/jaxiT3/files/t/es/px/<table>.px`.
 

@@ -173,6 +173,9 @@ svg text { font-family: var(--f-body); }
 
 details { margin-top: 4px; }
 summary { cursor: pointer; font-size: 12.5px; color: var(--accent); width: fit-content; }
+.why ul { margin: 6px 0 2px; padding-left: 18px; font-size: 12.5px; color: var(--fg-2); }
+.why li { margin: 3px 0; }
+.why li b { color: var(--fg); font-weight: 600; }
 .table-wrap { overflow-x: auto; margin-top: 8px; max-height: 360px; overflow-y: auto; }
 table { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
 th, td { text-align: right; padding: 5px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -283,6 +286,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
         </div>
         <div class="legend" id="lg-rates"></div>
         <div class="chart" id="c-rates"></div>
+        <p class="note">A survey estimate, by nationality. "Unemployed" means without work, looking for a job and able to start, whether registered at an employment office or not. The census chart below counts differently and gives lower figures: <a href="#epa-vs-census">why the numbers differ</a>.</p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-rates"></div></details>
         <div class="vars">INE · EPA · tables 65290, 65299, 65300, 65309 · quarterly · "Spanish" includes dual nationals</div>
       </article>
@@ -319,7 +323,16 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
         </div>
         <div class="legend" id="lg-cen"></div>
         <div class="chart" id="c-cen"><div class="empty">Loading census data…</div></div>
-        <p class="note" id="cen-note">From INE's annual census, which takes work status from Social Security and employment-office registers, not from a survey. Someone out of work who is not registered at an employment office counts as inactive, not unemployed, so unemployment rates here are not comparable with the EPA's. "Other inactive" is everyone who is neither working, registered as unemployed, receiving a pension nor studying: people looking after the home or family, people out of work but not registered, and so on. Born abroad includes people who have since become Spanish citizens.</p>
+        <p class="note" id="cen-note">From INE's annual census, which takes work status from Social Security and employment-office registers, not from a survey. "Other inactive" is everyone who is neither working, registered as unemployed, receiving a pension nor studying: people looking after the home or family, people out of work but not registered, and so on.</p>
+        <details class="why" id="epa-vs-census"><summary>Why these numbers differ from the EPA charts above</summary>
+          <ul>
+            <li><b>Registers, not a survey.</b> "In work" here means registered with Social Security or in tax records, so informal work is not counted. "Unemployed" means registered as a job seeker at an employment office. The EPA asks people what they did, so it counts both.</li>
+            <li><b>Unregistered job seekers count as inactive.</b> That is why the activity and unemployment rates here are lower than the EPA's (on 1 January 2024: 55% of people born abroad were active and 13% of those were unemployed; in the EPA for 2024 Q1, 69% and 19% of foreign nationals).</li>
+            <li><b>Country of birth, not nationality.</b> Born abroad includes people who have become Spanish, many of them older or retired. Foreign nationals include children of immigrants born in Spain. The two groups are about the same size but are not the same people.</li>
+            <li><b>One day, not a quarter.</b> The census is a snapshot on 1 January; the EPA is a quarterly estimate.</li>
+            <li><b>Which to use:</b> the EPA for unemployment rates and change over time; the census to compare countries of birth and provinces, where the EPA sample is too small.</li>
+          </ul>
+        </details>
         <details><summary>Show data</summary><div class="table-wrap" id="t-cen"></div></details>
         <div class="vars">INE · Censo anual de población · table 67129 · inactive = pensioners + students + other inactive</div>
       </article>
@@ -344,7 +357,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
           </div>
         </div>
         <div class="chart" id="c-pm"><div class="empty">Loading map…</div></div>
-        <p class="note" id="pm-note">Click a province to open it in "Work status by country of birth" above. Unemployment from the census counts only people registered as unemployed, so it is lower than the EPA's.</p>
+        <p class="note" id="pm-note">Click a province to open it in "Work status by country of birth" above. Unemployment from the census counts only people registered as unemployed, so it is lower than the EPA's: <a href="#epa-vs-census">why the numbers differ</a>.</p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-pm"></div></details>
         <div class="vars">INE · Censo anual de población · tables 67129 (country of birth) and 67130 (nationality) · groups with fewer than 300 people in a province are not coloured</div>
       </article>
@@ -360,7 +373,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
           </div>
         </div>
         <div class="chart" id="c-rm"><div class="empty">Loading map…</div></div>
-        <p class="note">Annual average of the four quarterly EPA estimates. Regions where the group is under 5,000 people in the estimate are not coloured: INE warns such figures have large sampling errors. Ceuta and Melilla are shown as dots.</p>
+        <p class="note">Annual average of the four quarterly EPA estimates. Regions where the group is under 5,000 people in the estimate are not coloured: INE warns such figures have large sampling errors. Ceuta and Melilla are shown as dots. These EPA rates are by nationality and differ from the census map above: <a href="#epa-vs-census">why the numbers differ</a>.</p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-rm"></div></details>
         <div class="vars">INE · EPA · tables 65290 (population 16+), 65299 (active), 65309 (employed) · rates computed from annual averages</div>
       </article>
@@ -1654,6 +1667,10 @@ function kpis() {
 }
 
 // ---------- charts ----------
+document.addEventListener('click', ev => {
+  const a = ev.target.closest('a[href="#epa-vs-census"]');
+  if (a) $('#epa-vs-census').open = true;
+});
 function renderAll() {
   const c = C();
   const P = D.population, E = D.epa, A = D.affiliation, B = D.benefits, I = D.imv, V = D.poverty, PV = D.epaPV, S = D.snapshots;

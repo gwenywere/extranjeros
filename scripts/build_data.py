@@ -494,6 +494,41 @@ def build(series_file: Path, snapshot_file: Path, eustat_csv: Path | None = None
     return d
 
 
+def benefit_rates(path: Path, data: dict) -> dict:
+    """All unemployment-benefit recipients (yearbook PRD-1) minus foreign ones (PEX-1) = Spanish nationals,
+    each per 100 people in work, in the labour force, unemployed and aged 16+ (EPA annual averages)."""
+    prd = pd.read_csv(path)
+    parts = prd[['contributory', 'assistance', 'rai', 'other']].sum(axis=1)
+    bad = prd[(parts - prd['total']).abs() > 5]
+    if len(bad):
+        raise SystemExit(f'{path}: benefit levels do not add up to the total in {bad["year"].tolist()}')
+    b, e = data['benefits'], data['epa']
+    years = [int(t[:4]) for t in b['t']]
+    prd = prd.set_index('year')
+    if set(years) - set(prd.index):
+        raise SystemExit(f'{path}: no total for {sorted(set(years) - set(prd.index))}')
+    out = {'freq': 'Y', 't': b['t'], 'recipients': {'fx': [], 'es': []}, 'share': []}
+    measures = {'employed': 'employed', 'active': 'active', 'unemployed': 'unemployed', 'pop16': 'pop16'}
+    for m in measures:
+        out[m] = {'fx': [], 'es': []}
+    for y, fx, sh in zip(years, b['fx'], b['share']):
+        total = int(prd.loc[y, 'total'])
+        share = 100 * fx / total
+        # the yearbook's own foreign share (PEX-1, one decimal) must agree with total and foreign count
+        if abs(share - sh) > 0.2:
+            raise SystemExit(f'{y}: foreign share {share:.2f}% from PRD-1 total vs {sh}% in PEX-1')
+        out['recipients']['fx'].append(fx)
+        out['recipients']['es'].append(total - fx)
+        out['share'].append(round(share, 2))
+        idx = [i for i, t in enumerate(e['t']) if t.startswith(str(y))]
+        if len(idx) != 4:
+            raise SystemExit(f'EPA: {len(idx)} quarters in {y}, need 4 for an annual average')
+        for m in measures:
+            for g in ('fx', 'es'):
+                out[m][g].append(round(sum(e[m][g][i] for i in idx) / 4))
+    return out
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('series_file', type=Path)
@@ -512,6 +547,8 @@ def main() -> None:
     ap.add_argument('--epa-pop', type=Path, default=Path('data/ine_65290_epa_poblacion16_nacionalidad_ccaa.px'))
     ap.add_argument('--epa-active', type=Path, default=Path('data/ine_65299_epa_activos_nacionalidad_ccaa.px'))
     ap.add_argument('--epa-employed', type=Path, default=Path('data/ine_65309_epa_ocupados_nacionalidad_ccaa.px'))
+    ap.add_argument('--prd', type=Path, default=Path('data/mites_prd1_beneficiarios_2013_2024.csv'),
+                    help='All unemployment-benefit recipients by year (Anuario de Estadísticas, table PRD-1)')
     ap.add_argument('--sectors', type=Path, default=Path('data/ine_69964_censo_ocupados_actividad_nacionalidad.px'),
                     help='INE census table 69964 (employed by economic section and nationality)')
     args = ap.parse_args()
@@ -549,6 +586,10 @@ def main() -> None:
         data['snapshots']['rgiContext'] = rgi_context(args.rgi_origin, args.census, args.census_nat)
     else:
         print('Warning: RGI context skipped (needs --rgi-origin, --census and --census-nat files)')
+    if args.prd.exists():
+        data['benefitRates'] = benefit_rates(args.prd, data)
+    else:
+        print(f'Warning: {args.prd} not found; no benefits-per-100 chart')
     out.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'Wrote {out} ({out.stat().st_size / 1024:.0f} KB)')
 

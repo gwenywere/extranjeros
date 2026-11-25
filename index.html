@@ -421,8 +421,8 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
   <!-- ===================== CONTRACTS ===================== -->
   <section id="contracts">
     <div class="section-head">
-      <h2>Contracts and occupations, 2025</h2>
-      <p>Employment contracts registered with the public employment services in 2025, from SEPE's annual report. A contract is not a person: foreign nationals signed 3,990,538 contracts but were 1,738,476 people, 2.3 contracts each, so their share of contracts (25.5%) is much higher than their share of jobs (14.1% of Social Security affiliates).</p>
+      <h2>Contracts and occupations</h2>
+      <p>Employment contracts registered with the public employment services. Occupations and the 2016 → 2025 trend come from SEPE's annual report on foreign workers; the type of contract from SEPE's monthly contract statistics, for <span class="ct-period">2026 so far</span>. A contract is not a person: foreign nationals signed 3,990,538 contracts but were 1,738,476 people, 2.3 contracts each, so their share of contracts in 2025 (25.5%) was much higher than their share of jobs (14.1% of Social Security affiliates).</p>
     </div>
     <div class="grid">
       <article class="card span-12" id="occ-card">
@@ -449,13 +449,13 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
           <p class="sub">Foreign nationals' contracts, SEPE's own rates. The 2022 labour reform cut temporary contracts, most of all for men</p></div></div>
         <div class="legend" id="lg-ctrend"></div>
         <div class="chart" id="c-ctrend"></div>
-        <p class="note">SEPE publishes these rates for foreign nationals only. Its part-time rate is lower than the share of part-time contracts below, and the report does not say how it is defined.</p>
+        <p class="note">SEPE publishes these rates for foreign nationals only. Its part-time rate is lower than the share of part-time contracts in the report's own tables (men in 2025: 12.3% against 16.5%), and the report does not say how it is defined.</p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-ctrend"></div></details>
         <div class="vars">SEPE report p. 38 (SISPE, contracts registered 2016–2025)</div>
       </article>
       <article class="card span-12" id="ctype-card">
         <div class="head"><div><h3>Type of contract: foreign vs Spanish nationals</h3>
-          <p class="sub" id="ctype-sub">Contracts signed in 2025, by duration and working time</p></div></div>
+          <p class="sub">Contracts signed in <span class="ct-period">2026 so far</span>, by duration and working time</p></div></div>
         <div class="sub2">
           <div>
             <h4>Duration and working time</h4>
@@ -464,15 +464,15 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
             <div class="chart" id="c-ctype"></div>
           </div>
           <div>
-            <h4>Share of contracts that are…</h4>
-            <div class="seg" id="sw-ct-sex" role="group" aria-label="Sex"></div>
+            <h4>Share of contracts that are temporary</h4>
+            <div class="seg" id="sw-ct-by" role="group" aria-label="Break down by"></div>
             <div class="legend" id="lg-ctcmp"></div>
             <div class="chart" id="c-ctcmp"></div>
           </div>
         </div>
         <p class="note" id="ctype-note"></p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-ctype"></div></details>
-        <div class="vars">Foreign nationals: SEPE report pp. 32 and 37 · all contracts: SEPE Estadística de contratos, Dec 2025 year-to-date, table 2.7A · Spanish = all − foreign · permanent = initial permanent contracts + conversions to permanent · fixed-discontinuous = permanent contracts for seasonal or intermittent work</div>
+        <div class="vars">SEPE · Estadística de contratos, <span class="ct-period">2026 so far</span>, year-to-date tables 13.3A, 13.3.1A and 13.3.2A (all contracts), 13.3.3A and 43.3A (foreign nationals) · Spanish = all − foreign · permanent = initial permanent contracts + conversions to permanent · fixed-discontinuous = permanent contracts for seasonal or intermittent work</div>
       </article>
     </div>
   </section>
@@ -678,6 +678,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
     <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67129&amp;L=0" target="_blank" rel="noopener noreferrer">INE, Censo anual de población, table 67129</a>: population 16+ by region and province, sex, country of birth (17 countries and the rest of each continent) and relation to activity, 1 Jan 2021–2024. Work status comes from Social Security and employment-office registers.</li>
     <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=65290" target="_blank" rel="noopener noreferrer">INE, EPA by region and nationality</a>, tables 65290 (population 16+), 65299 (active) and 65309 (employed): annual averages for the region map. <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67130" target="_blank" rel="noopener noreferrer">INE census table 67130</a>: population 16+ by nationality and relation to activity, by province, 2021–2024, for the province map. <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=69964&amp;L=0" target="_blank" rel="noopener noreferrer">INE census table 69964</a>: employed people by nationality and economic section, by province, 2021–2024. Province shapes simplified from <a href="https://gadm.org" target="_blank" rel="noopener noreferrer">GADM</a>.</li>
     <li><a href="https://www.sepe.es/dctm/informes%3A09019af48026a2c4/RElTRVdFQg%3D%3D/4832-1.pdf" target="_blank" rel="noopener noreferrer">SEPE, Informe del Mercado de Trabajo de las Personas Extranjeras 2026</a> (2025 data): registered unemployment and benefit recipients on 31 Dec 2025; foreign affiliates by scheme, sex, nationality, type of work, age and contract (Seguridad Social, 31 Dec 2025); contracts by type, working time and occupation (SISPE, all of 2025). The report publishes these only in the PDF; the figures were read from it page by page and checked against its own totals (see <code>data/sepe_informe_extranjeros_2025.README.txt</code>).</li>
+    <li><a href="https://www.sepe.es/HomeSepe/que-es-el-sepe/estadisticas/contratos/estadisticas-nuevas.html" target="_blank" rel="noopener noreferrer">SEPE, Estadística de contratos</a>, year-to-date tables (<span class="ct-period">2026 so far</span>): all contracts and foreign nationals' contracts by duration, working time, sex and age (tables 13.3A, 13.3.1A, 13.3.2A, 13.3.3A, 43.3A).</li>
     <li><a href="https://www.eustat.eus/elementos/tbl0021467_c.html" target="_blank" rel="noopener noreferrer">Eustat</a> (table tbl0021467, census of population): population 16+ by activity and continent of birth, by province and sex, Basque Country, 1 Jan 2025.</li>
     <li><a href="https://bibliovirtual.inclusion.gob.es/documents/d/asset-library-6602793/indicadores_marco-estrategico-ii" target="_blank" rel="noopener noreferrer">Ministerio de Inclusión, indicadores del Marco Estratégico II</a>: Basque minimum income (RGI) 2024; IMV recipients December 2025.</li>
     <li><a href="https://opendata.euskadi.eus/contenidos/estadistica/estadisticas_ebpgi2023/opendata/2023_Estadistica-de-Personas-Beneficiarias-de-Prestaciones-de-Garantia-de-Ingresos-en-Euskadi.xlsx" target="_blank" rel="noopener noreferrer">Lanbide / Gobierno Vasco, Estadística de personas beneficiarias de prestaciones de garantía de ingresos 2023</a>: RGI holders. The open tables have no nationality or birthplace; those figures are as reported by <a href="https://www.gasteizhoy.com/cuantos-perceptores-rgi-son-extranjeros/" target="_blank" rel="noopener noreferrer">Gasteiz Hoy</a> (27 Aug 2024), and its totals, sex and territory figures match the official tables. Adults by nationality: <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67130&amp;L=0" target="_blank" rel="noopener noreferrer">INE census table 67130</a>.</li>
@@ -1306,30 +1307,41 @@ function renderContracts() {
   ];
   $('#ctype-card').hidden = !CC;
   if (CC) {
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const P = CC.period;
+  const period = P.month === 12 ? String(P.year) : P.month === 1 ? `Jan ${P.year}` : `Jan–${MON[P.month - 1]} ${P.year}`;
+  document.querySelectorAll('.ct-period').forEach((el) => { el.textContent = period; });
   const pct = (d, k) => 100 * d[k] / d3.sum(TYPES, ([t]) => d[t]);
   const dParts = (d) => TYPES.map(([k, l, col]) => ({ label: l, v: d[k], color: col, ink: inkOn(col) }));
   legend('#lg-ctype', TYPES.map(([, l, col]) => ({ label: l, color: col, kind: 'box' })));
   seg100('#c-ctype', [{ label: 'Foreign nationals', parts: dParts(CC.detail.fx) }, { label: 'Spanish nationals', parts: dParts(CC.detail.es) }],
     { rowH: 44, labelW: 124 });
 
-  state.ctSex = state.ctSex || 'all';
-  seg('#sw-ct-sex', [['all', 'All'], ['men', 'Men'], ['women', 'Women']], state.ctSex, (v) => { state.ctSex = v; renderContracts(); });
-  const S2 = CC.bySex[state.ctSex];
   const share = (d, k) => 100 * d[k] / (d.permanent + d.temporary);
-  const RATES = [['temporary', 'Temporary'], ['fixed_discontinuous', 'Fixed-discontinuous'], ['part_time', 'Part time'], ['full_time', 'Full time']];
+  const AGE = CC.byAge.ages.map((a) => (a === '60+' ? 'Aged 60+' : `Aged ${a.replace('-', '–')}`));
+  const ROWS = {
+    sex: [['all', 'All'], ['men', 'Men'], ['women', 'Women']].map(([k, l]) => ({ label: l, a: share(CC.bySex[k].fx, 'temporary'), b: share(CC.bySex[k].es, 'temporary') })),
+    age: AGE.map((l, i) => ({ label: l, a: share(CC.byAge.fx[i], 'temporary'), b: share(CC.byAge.es[i], 'temporary') })),
+  };
+  state.ctBy = state.ctBy || 'sex';
+  seg('#sw-ct-by', [['sex', 'By sex'], ['age', 'By age']], state.ctBy, (v) => { state.ctBy = v; renderContracts(); });
   legend('#lg-ctcmp', [{ label: 'Foreign nationals', color: c.fx, kind: 'box' }, { label: 'Spanish nationals', color: c.es, kind: 'box' }]);
-  groupedBars('#c-ctcmp', RATES.map(([k, l]) => ({ label: l, a: share(S2.fx, k), b: share(S2.es, k) })),
-    { aLabel: 'Foreign nationals', bLabel: 'Spanish nationals', aColor: c.fx, bColor: c.es, fmt: fp, labelW: 140 });
-  const A2 = CC.bySex.all;
-  $('#ctype-note').textContent = `Foreign nationals' contracts are less often temporary than Spanish nationals' (${fp(share(A2.fx, 'temporary'))} against ${fp(share(A2.es, 'temporary'))}), `
-    + `mostly because ${fp(share(A2.fx, 'fixed_discontinuous'))} of them are fixed-discontinuous, against ${fp(share(A2.es, 'fixed_discontinuous'))}: permanent contracts for seasonal work, common in farming and hospitality. `
-    + `They are also less often part time (${fp(share(A2.fx, 'part_time'))} against ${fp(share(A2.es, 'part_time'))}). These are contracts signed during the year, not jobs held at one time: a person on short contracts signs many. `
-    + 'Duration and working time are published together only for both sexes.';
+  groupedBars('#c-ctcmp', ROWS[state.ctBy], { aLabel: 'Foreign nationals', bLabel: 'Spanish nationals', aColor: c.fx, bColor: c.es, fmt: fp, labelW: 84 });
+
+  // whole-group rates from the five-way split
+  const rate = (d, keys) => 100 * d3.sum(keys, (k) => d[k]) / d3.sum(TYPES, ([t]) => d[t]);
+  const FX = CC.detail.fx, ES = CC.detail.es;
+  const fd = (d) => rate(d, ['permanent_fixed_discontinuous']), pt = (d) => rate(d, ['permanent_part_time', 'temporary_part_time']);
+  const gaps = ROWS.age.map((r) => r.b - r.a);
+  $('#ctype-note').textContent = `Foreign nationals' contracts are less often temporary than Spanish nationals' (${fp(ROWS.sex[0].a)} against ${fp(ROWS.sex[0].b)}), `
+    + `for men and women and at every age (a gap of ${Math.round(d3.min(gaps))}–${Math.round(d3.max(gaps))} points). `
+    + `Much of the difference is fixed-discontinuous contracts, ${fp(fd(FX))} of foreign nationals' against ${fp(fd(ES))}: permanent contracts for seasonal work, common in farming and hospitality. `
+    + `Foreign nationals' contracts are also less often part time (${fp(pt(FX))} against ${fp(pt(ES))}). These are contracts signed during the year, not jobs held at one time: a person on short contracts signs many.`;
+  const row = (l, f, e, k) => [l, fmt(f[k]), fp(share(f, k)), fmt(e[k]), fp(share(e, k)), fp(100 * f[k] / (f[k] + e[k]))];
   table('#t-ctype', ['Type of contract', 'Foreign nationals', '% of foreign', 'Spanish nationals', '% of Spanish', 'Foreign share'],
-    TYPES.map(([k, l]) => [l, fmt(CC.detail.fx[k]), fp(pct(CC.detail.fx, k)), fmt(CC.detail.es[k]), fp(pct(CC.detail.es, k)),
-      fp(100 * CC.detail.fx[k] / (CC.detail.fx[k] + CC.detail.es[k]))])
-      .concat(['all', 'men', 'women'].flatMap((sx) => RATES.map(([k, l]) => [`${l} (${sx === 'all' ? 'all' : sx})`, fmt(CC.bySex[sx].fx[k]), fp(share(CC.bySex[sx].fx, k)),
-        fmt(CC.bySex[sx].es[k]), fp(share(CC.bySex[sx].es, k)), fp(100 * CC.bySex[sx].fx[k] / (CC.bySex[sx].fx[k] + CC.bySex[sx].es[k]))]))));
+    TYPES.map(([k, l]) => [l, fmt(FX[k]), fp(pct(FX, k)), fmt(ES[k]), fp(pct(ES, k)), fp(100 * FX[k] / (FX[k] + ES[k]))])
+      .concat([['men', 'Temporary, men'], ['women', 'Temporary, women']].map(([k, l]) => row(l, CC.bySex[k].fx, CC.bySex[k].es, 'temporary')))
+      .concat(AGE.map((l, i) => row(`Temporary, ${l.toLowerCase()}`, CC.byAge.fx[i], CC.byAge.es[i], 'temporary'))));
   }
 
   const TR = R.contracts_trend;

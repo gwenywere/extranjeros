@@ -29,6 +29,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+pd.set_option('io.excel.xlsx.reader', 'openpyxl')  # keep the current .xlsx reader (pandas 3 warns otherwise)
+
 COUNTRY_EN = {
     'Marruecos': 'Morocco', 'Rumania': 'Romania', 'Italia': 'Italy', 'Perú': 'Peru', 'Ucrania': 'Ukraine',
     'Pakistán': 'Pakistan',
@@ -436,44 +438,103 @@ def sepe_report(path: Path) -> dict:
     return out
 
 
-def contracts_compare(path: Path, rep: dict) -> dict:
-    """Contracts by duration and working time, foreign vs Spanish nationals (2025).
-    All contracts from SEPE's contract statistics (table 2.7A); Spanish = all - foreign (SEPE foreign-workers report)."""
-    t = pd.read_csv(path).set_index(['sex', 'row'])
-    W = ['full_time', 'part_time', 'fixed_discontinuous']
-    perm = lambda sex: sum(t.loc[(sex, r), W] for r in ('indefinido', 'indefinido_discapacidad', 'convertidos'))
-    tot = lambda sex: t.loc[(sex, 'total'), W]
-    def check(name, got, want, tol):
-        if abs(got - want) > tol:
-            raise SystemExit(f'{path}: {name} is {got}, expected {want}')
-    CT, T = rep['contracts_type'], rep['contracts_total']['all']
-    check('permanent contracts', int(perm('all').sum()), 6443446, 0)
-    check('total contracts', int(tot('all').sum()), T['foreign'] + T['spanish'], 0)
-    for sex in ('men', 'women'):
-        check(f'men + women, {sex}', int(tot('men').sum() + tot('women').sum()), int(tot('all').sum()), 0)
-    fxp = {w: CT['permanent'][w] for w in W}
-    fxt = {w: CT['temporary'][w] for w in W}
-    check('foreign share of permanent', round(100 * sum(fxp.values()) / perm('all').sum(), 2), CT['permanent']['foreign_share_pct'], 0.01)
-    check('foreign share of temporary', round(100 * sum(fxt.values()) / (tot('all') - perm('all')).sum(), 2), CT['temporary']['foreign_share_pct'], 0.01)
-    out = {'detail': {'fx': {}, 'es': {}}, 'bySex': {}}
+MONTHS_ES = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE']
+AGES = ['16-19', '20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59', '60+']
+
+
+def contracts_acum(path: Path) -> dict:
+    """Contracts by duration, working time, sex and age, foreign vs Spanish nationals, from SEPE's
+    Estadística de contratos, year-to-date workbook (ESTADISTICA_DE_CONTRATOS_ACUM.xls).
+    Spanish = all - foreign. Permanent = initial permanent contracts + conversions to permanent."""
+    book = pd.read_excel(path, sheet_name=None, header=None, engine='calamine')
+    sheet = {k.strip(): v for k, v in book.items()}
+    def fail(msg):
+        raise SystemExit(f'{path}: {msg}')
+    def check(name, got, want):
+        if got != want:
+            fail(f'{name} is {got}, expected {want}')
+    # period: "OCTUBRE 2026" in the header of every table
+    stamp = next(str(v).strip() for v in sheet['13.3.3A'].iloc[2] if isinstance(v, str) and v.strip())
+    month, year = stamp.split()
+    if month not in MONTHS_ES:
+        fail(f'unexpected period {stamp!r}')
+    for name in ('13.3A', '13.3.1.A', '13.3.2A', '43.1A', '43.3A'):
+        got = next(str(v).strip() for v in sheet[name].iloc[2] if isinstance(v, str) and v.strip())
+        check(f'period of table {name}', got, stamp)
+
+    def by_age(name):
+        """Table 13.3.x: {(working time, 'permanent'|'total'): [total, 10 age groups]}"""
+        df, out, block = sheet[name], {}, None
+        blocks = {'JORNADA COMPLETA': 'full_time', 'JORNADA PARCIAL': 'part_time', 'FIJOS DISCONTINUOS': 'fixed_discontinuous'}
+        for _, r in df.iterrows():
+            label = str(r[1]).strip()
+            if label in blocks:
+                block = blocks[label]
+                continue
+            if label not in ('TOTAL CONTRATOS', 'TOTAL') and not label.startswith(('INDEF', 'CONVERTIDOS')):
+                continue
+            vals = [0 if pd.isna(v) else int(v) for v in r[2:13]]
+            if label == 'TOTAL CONTRATOS':
+                out['all'] = vals
+            elif block and (label.startswith('INDEF') or label.startswith('CONVERTIDOS')):
+                out[(block, 'permanent')] = [x + y for x, y in zip(out.get((block, 'permanent'), [0] * 11), vals)]
+            elif block and label == 'TOTAL':
+                out[(block, 'total')] = vals
+        W = ('full_time', 'part_time', 'fixed_discontinuous')
+        for col in range(11):
+            check(f'{name}: working times, column {col}', sum(out[(w, 'total')][col] for w in W), out['all'][col])
+        check(f'{name}: age groups', sum(out['all'][1:]), out['all'][0])
+        check(f'{name}: fixed-discontinuous contracts are all permanent', out[('fixed_discontinuous', 'permanent')], out[('fixed_discontinuous', 'total')])
+        return out
+
+    fx, al, men, women = by_age('13.3.3A'), by_age('13.3A'), by_age('13.3.1.A'), by_age('13.3.2A')
+    for col in range(11):
+        check(f'men + women, column {col}', men['all'][col] + women['all'][col], al['all'][col])
+    W = ('full_time', 'part_time', 'fixed_discontinuous')
+
+    def summary(t, col=0):
+        perm = sum(t[(w, 'permanent')][col] for w in W)
+        return {'permanent': perm, 'temporary': t['all'][col] - perm, **{w: t[(w, 'total')][col] for w in W}}
+
+    def total_row(name):
+        df = sheet[name]
+        rows = df[df[2].astype(str).str.strip() == 'TOTAL']
+        if len(rows) != 1:
+            fail(f'table {name}: no single TOTAL row')
+        return [0 if pd.isna(v) else int(v) for v in rows.iloc[0, 3:]]
+    # foreign nationals by sex: table 43.3A (initial permanent, converted, temporary for both sexes, men, women)
+    t43 = total_row('43.3A')
+    fx_sex = {'all': t43[1:4], 'men': t43[4:7], 'women': t43[8:11]}
+    t431 = total_row('43.1A')  # total | EU: total, permanent, converted, temporary | non-EU: same
+    fxa = summary(fx)
+    check('foreign total, tables 13.3.3A vs 43.3A', t43[0], fx['all'][0])
+    check('foreign total, tables 13.3.3A vs 43.1A', t431[0], fx['all'][0])
+    check('foreign permanent, tables 13.3.3A vs 43.3A', sum(fx_sex['all'][:2]), fxa['permanent'])
+    for k in range(3):
+        check(f'foreign men + women, column {k}', fx_sex['men'][k] + fx_sex['women'][k], fx_sex['all'][k])
+    check('foreign EU + non-EU', t431[1] + t431[5], t431[0])
+
+    out = {'period': {'year': int(year), 'month': MONTHS_ES.index(month) + 1}, 'detail': {'fx': {}, 'es': {}},
+           'bySex': {}, 'byAge': {'ages': AGES, 'fx': [], 'es': []}, 'byOrigin': {}}
     for w in W:
-        out['detail']['fx'][f'permanent_{w}'] = fxp[w]
-        out['detail']['fx'][f'temporary_{w}'] = fxt[w]
-        out['detail']['es'][f'permanent_{w}'] = int(perm('all')[w]) - fxp[w]
-        out['detail']['es'][f'temporary_{w}'] = int(tot('all')[w] - perm('all')[w]) - fxt[w]
-    check('Spanish contracts', sum(out['detail']['es'].values()), T['spanish'], 0)
-    # by sex: duration and working time are only published separately for foreign nationals
-    SD, SW = rep['contracts_sex_duration'], rep['contracts_sex_worktime']
-    fx_sex = {'all': {'permanent': sum(fxp.values()), 'temporary': sum(fxt.values()), **{w: fxp[w] + fxt[w] for w in W}}}
-    for sex in ('men', 'women'):
-        fx_sex[sex] = {'permanent': SD[sex]['permanent'], 'temporary': SD[sex]['temporary'], **{w: SW[sex][w] for w in W}}
-        check(f'foreign {sex}: duration vs working time', SD[sex]['permanent'] + SD[sex]['temporary'], sum(SW[sex][w] for w in W), 0)
-    for w in W + ['permanent']:
-        check(f'foreign men + women, {w}', fx_sex['men'][w] + fx_sex['women'][w], fx_sex['all'][w], 0)
-    for sex in ('all', 'men', 'women'):
-        allc = {'permanent': int(perm(sex).sum()), 'temporary': int((tot(sex) - perm(sex)).sum()), **{w: int(tot(sex)[w]) for w in W}}
-        f = fx_sex[sex]
-        out['bySex'][sex] = {'fx': f, 'es': {k: allc[k] - f[k] for k in allc}}
+        fp, ft = fx[(w, 'permanent')][0], fx[(w, 'total')][0]
+        ap_, at = al[(w, 'permanent')][0], al[(w, 'total')][0]
+        out['detail']['fx'][f'permanent_{w}'] = fp
+        out['detail']['es'][f'permanent_{w}'] = ap_ - fp
+        if w != 'fixed_discontinuous':
+            out['detail']['fx'][f'temporary_{w}'] = ft - fp
+            out['detail']['es'][f'temporary_{w}'] = (at - ap_) - (ft - fp)
+    check('Spanish contracts', sum(out['detail']['es'].values()), al['all'][0] - fx['all'][0])
+    for sex, t in (('all', al), ('men', men), ('women', women)):
+        a = summary(t)
+        f = {'permanent': sum(fx_sex[sex][:2]), 'temporary': fx_sex[sex][2]}
+        out['bySex'][sex] = {'fx': f, 'es': {k: a[k] - f[k] for k in f}}
+    for col in range(1, 11):
+        f, a = summary(fx, col), summary(al, col)
+        out['byAge']['fx'].append(f)
+        out['byAge']['es'].append({k: a[k] - f[k] for k in a})
+    out['byOrigin'] = {'eu': {'permanent': t431[2] + t431[3], 'temporary': t431[4]},
+                       'non_eu': {'permanent': t431[6] + t431[7], 'temporary': t431[8]}}
     return out
 
 
@@ -631,8 +692,8 @@ def main() -> None:
                     help='Households and persons by nationality of members (ECEPOV 2021, INE table 56556)')
     ap.add_argument('--households', type=Path, default=Path('data/ine_60135_hogares_total.csv'),
                     help='Total households, quarterly (Estadística Continua de Población, INE table 60135)')
-    ap.add_argument('--contracts-all', type=Path, default=Path('data/sepe_contratos_2025_jornada.csv'),
-                    help='All contracts in 2025 by working time and sex (SEPE contract statistics, table 2.7A)')
+    ap.add_argument('--contracts', type=Path, default=Path('data/ESTADISTICA_DE_CONTRATOS_ACUM.xls'),
+                    help='SEPE Estadística de contratos, year-to-date workbook (tables 13.3A, 13.3.1A, 13.3.2A, 13.3.3A, 43.1A, 43.3A)')
     ap.add_argument('--prd', type=Path, default=Path('data/mites_prd1_beneficiarios_2013_2024.csv'),
                     help='All unemployment-benefit recipients by year (Anuario de Estadísticas, table PRD-1)')
     ap.add_argument('--sectors', type=Path, default=Path('data/ine_69964_censo_ocupados_actividad_nacionalidad.px'),
@@ -666,10 +727,10 @@ def main() -> None:
     data = build(args.series_file, args.snapshot_file, eustat)
     if args.sepe_report.exists():
         data['snapshots']['sepeReport'] = sepe_report(args.sepe_report)
-        if args.contracts_all.exists():
-            data['snapshots']['sepeReport']['contracts_compare'] = contracts_compare(args.contracts_all, data['snapshots']['sepeReport'])
+        if args.contracts.exists():
+            data['snapshots']['sepeReport']['contracts_compare'] = contracts_acum(args.contracts)
         else:
-            print(f'Warning: {args.contracts_all} not found; contract types without the Spanish comparison')
+            print(f'Warning: {args.contracts} not found; no contract-type card')
     else:
         print(f'Warning: {args.sepe_report} not found; no contracts/occupations or scheme-by-sex charts')
     if all(p.exists() for p in (args.rgi_origin, args.census, args.census_nat)):

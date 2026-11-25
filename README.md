@@ -11,7 +11,7 @@ Same design as the Nacimientos pages in `../site/` (plain HTML + [D3](https://d3
 - **Work and unemployment** (EPA): unemployment, activity and employment rates (Spanish vs foreign, or EU / non-EU); foreigners in work and unemployed; three ways to count unemployed foreigners in 2025; work status by continent or country of birth from the annual census, with switches for sex, year (2021–2024) and region or province
 - **Regions and provinces**: a province map from the census (share of adults, unemployment rate or share in work, for foreign nationals, people born abroad, each continent or each of 17 birth countries; click a province to open it in the census chart) and a region map from the EPA (activity, employment and unemployment rates of foreign, EU, non-EU and Spanish nationals, or the foreign − Spanish gap; annual averages 2002–2025)
 - **Sectors**: employed foreign nationals by economic section (CNAE) and their share of each sector's workforce, by region or province, sex and year (census 2021–2024)
-- **Contracts and occupations, 2025** (from SEPE's annual report): the 10 occupations with most contracts for foreign nationals and their share of each occupation's contracts; contracts by broad occupational group, foreign vs Spanish; contract type and working time, foreign vs Spanish nationals (with a sex switch for the summary rates); temporary and part-time contracts 2016 → 2025
+- **Contracts and occupations** (SEPE's 2025 report on foreign workers and its monthly contract statistics): the 10 occupations with most contracts for foreign nationals and their share of each occupation's contracts; contracts by broad occupational group, foreign vs Spanish; contract type and working time, foreign vs Spanish nationals, with the temporary share by sex or age (SEPE contract statistics, current year to date); temporary and part-time contracts 2016 → 2025
 - **Social Security**: foreign affiliates by scheme, EU / non-EU or sex; the 15 largest nationalities, 2012 → 2026
 - **Benefits**: foreign unemployment-benefit recipients by type 2013–2024 and on 31 Dec 2025; recipients for every 100 people in work, in the labour force, unemployed or aged 16+, Spanish vs foreign nationals; IMV recipients by nationality, as counts or per 100 households or residents
 - **Poverty** (ECV): AROPE, poverty risk, severe deprivation and low work intensity by nationality
@@ -30,7 +30,7 @@ Same design as the Nacimientos pages in `../site/` (plain HTML + [D3](https://d3
 
 ## Rebuilding the data
 
-Needs `pandas` and `openpyxl`. From the project root:
+Needs `pandas`, `openpyxl` and `python-calamine` (for SEPE's `.xls` workbook). From the project root:
 
 ```bash
 python site_foreigners/scripts/build_data.py \
@@ -51,7 +51,7 @@ The benefits-per-100 card needs all recipients each year (Spanish = all − fore
 
 The IMV card's per-100-households view needs households by nationality, which INE no longer publishes. They are estimated each month from 2021: residents of each nationality ÷ the average size of all-Spanish and all-foreign households in ECEPOV 2021 (`data/ine_56556_ecepov2021_hogares_nacionalidad.csv`, option `--ecepov`), scaled so both add up to INE's total households (`data/ine_60135_hogares_total.csv`, option `--households`; see the README.txt next to them). The build stops if the estimate is more than 10% off INE's total before scaling.
 
-The Spanish side of the contract-type card is all contracts minus foreign ones. All contracts by working time and sex come from SEPE's contract statistics for December 2025, year-to-date, table 2.7A (`data/sepe_contratos_2025_jornada.csv`, option `--contracts-all`). The build checks them against the foreign-workers report: same total, and the same foreign share of permanent and temporary contracts.
+The contract-type card reads SEPE's contract statistics, year-to-date workbook, straight from `data/ESTADISTICA_DE_CONTRATOS_ACUM.xls` (option `--contracts`). Download a newer one from <https://www.sepe.es/HomeSepe/que-es-el-sepe/estadisticas/contratos/estadisticas-nuevas.html> (the month's "acumulado" Excel file) and rebuild; the page takes the period from the file. It uses tables 13.3A, 13.3.1A and 13.3.2A (all contracts by working time, duration and age; men; women), 13.3.3A (the same for foreign nationals) and 43.1A and 43.3A (foreign nationals by EU / non-EU and sex). Spanish = all − foreign. The build stops if the tables are for different months, if working times or ages don't add up to the totals, if men + women don't add up to all, or if the foreign totals differ between tables. SEPE publishes foreign nationals' working time by age but not by sex, so the sex breakdown is permanent / temporary only.
 
 `regional.json` is built from INE tables 65290, 65299, 65309 (EPA by region), 67130 (census by nationality) and 69964 (census employment by sector), all in `data/` (options `--epa-pop`, `--epa-active`, `--epa-employed`, `--census-nat`, `--sectors`). Download newer versions from `https://www.ine.es/jaxiT3/files/t/es/px/<table>.px`.
 

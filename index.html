@@ -125,6 +125,14 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .span-7 { grid-column: span 7; } .span-5 { grid-column: span 5; } .span-6 { grid-column: span 6; } .span-12 { grid-column: span 12; }
 .card h3 { font-family: var(--f-display); font-size: 16px; font-weight: 600; margin: 0; text-wrap: balance; }
 .card .sub { color: var(--fg-2); font-size: 12.5px; margin: 0; }
+.basis { display: inline-block; margin: 0 0 6px; padding: 1px 8px; border: 1px solid var(--grid); border-radius: 999px;
+  font-size: 11px; font-weight: 600; letter-spacing: .02em; color: var(--fg-2); white-space: nowrap; }
+.basis.birth { border-style: dashed; }
+.defs { margin: 10px 0 10px; display: grid; gap: 6px; max-width: 90ch; color: var(--fg-2); }
+.defs dt { color: var(--fg); }
+.defs div { padding-left: 10px; border-left: 3px solid var(--grid); }
+.defs dt { font-weight: 600; display: inline; }
+.defs dd { display: inline; margin: 0; }
 .card .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 8px 16px; }
 .card .note { color: var(--fg-2); font-size: 12.5px; margin: 2px 0 0; }
 .card .vars { margin-top: auto; padding-top: 6px; font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); letter-spacing: 0.02em; }
@@ -232,11 +240,16 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
   <section id="who">
     <div class="section-head">
       <h2>Who counts as foreign</h2>
-      <p>Statistics classify people by <b>nationality</b>, not by origin: an immigrant who becomes a Spanish citizen counts as Spanish. Counting by <b>place of birth</b> gives a much larger number. Everything below uses nationality unless it says "born".</p>
+      <p>Statistics count "foreign" in two ways, and the numbers differ a lot. Every chart below has a label saying which one it uses.</p>
+      <dl class="defs">
+        <div><dt>Foreign nationals</dt> <dd>(label "By nationality"): people without Spanish citizenship, wherever they were born. They include <span id="def-fx-es">about half a million</span> people born in Spain, mostly children of immigrants. Someone with Spanish and another citizenship counts as Spanish. An immigrant who becomes a Spanish citizen stops being counted.</dd></div>
+        <div><dt>Born abroad</dt> <dd>(label "By country of birth"): people born outside Spain, whatever their citizenship. On <span id="def-date">1 Oct 2026</span> they included <span id="def-es-abroad">about 3.4 million</span> Spanish citizens: naturalised immigrants, and Spaniards born abroad such as children of emigrants.</dd></div>
+      </dl>
+      <p>Most sources (the EPA, Social Security, SEPE, benefits, the ECV) only record nationality. Country of birth comes from the census and Eustat.</p>
     </div>
     <div class="grid">
       <article class="card span-5">
-        <div class="head"><div><h3>Nationality and place of birth</h3><p class="sub" id="nb-sub">Population of Spain</p></div></div>
+        <div class="head"><div><h3>Nationality and country of birth</h3><p class="sub" id="nb-sub">Population of Spain</p></div></div>
         <div class="chart" id="c-nb-bar"></div>
         <div class="matrix" id="c-nb"></div>
         <div class="vars">INE · Estadística Continua de Población · provisional</div>
@@ -255,7 +268,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
   <section id="shares">
     <div class="section-head">
       <h2>Share of the total</h2>
-      <p>Foreign nationals' share of each group, next to their share of the adult population (grey area). A line above the grey area means foreigners make up more of that group than of the population aged 16+.</p>
+      <p>Foreign nationals' share of each group, next to their share of the adult population (grey area). A line above the grey area means foreign nationals make up more of that group than of the population aged 16+.</p>
     </div>
     <div class="grid">
       <article class="card span-12">
@@ -303,7 +316,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
       </article>
 
       <article class="card span-5">
-        <div class="head"><div><h3>Three ways to count unemployed foreigners</h3><p class="sub">Foreign nationals, Spain, 2025</p></div></div>
+        <div class="head"><div><h3>Three ways to count unemployed foreign nationals</h3><p class="sub">Foreign nationals, Spain, 2025</p></div></div>
         <div class="chart" id="c-count"></div>
         <p class="note">Three different statistics. The EPA is a household survey; registered unemployment counts people signed up at public employment offices; not every unemployed person is entitled to a benefit. They should not be subtracted from each other.</p>
         <div class="vars">SEPE · Informe del Mercado de Trabajo de las Personas Extranjeras 2026</div>
@@ -531,7 +544,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
         </div>
         <div class="legend" id="lg-brate"></div>
         <div class="chart" id="c-brate"></div>
-        <p class="note">Each count is divided by the size of the same nationality group, so the two can be compared. "Per 100 unemployed" is roughly the share of unemployed people who get a benefit; foreigners, with shorter work histories, likely qualify less often. Naturalised immigrants count as Spanish. 2020 includes furloughed (ERTE) workers.</p>
+        <p class="note">Each count is divided by the size of the same nationality group, so the two can be compared. "Per 100 unemployed" is roughly the share of unemployed people who get a benefit; foreign nationals, with shorter work histories, likely qualify less often. Naturalised immigrants count as Spanish. 2020 includes furloughed (ERTE) workers.</p>
         <details><summary>Show data</summary><div class="table-wrap" id="t-brate"></div></details>
         <div class="vars">Recipients: Ministerio de Trabajo, Anuario de Estadísticas, tables PRD-1 (all) and PEX-1 (foreign); Spanish = all − foreign · people in work, labour force, unemployed and aged 16+: INE EPA, average of the four quarters</div>
       </article>
@@ -553,7 +566,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
   <section id="poverty">
     <div class="section-head">
       <h2>Poverty and social exclusion</h2>
-      <p>From the Living Conditions Survey (ECV), people aged 16+. The year is the survey year; income refers to the year before. EU and non-EU foreigners are shown separately because their situations differ a lot.</p>
+      <p>From the Living Conditions Survey (ECV), people aged 16+. The year is the survey year; income refers to the year before. EU and non-EU nationals are shown separately because their situations differ a lot.</p>
     </div>
     <div class="grid">
       <article class="card span-12">
@@ -573,7 +586,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
   <section id="euskadi">
     <div class="section-head">
       <h2>Basque Country (Euskadi)</h2>
-      <p>The EPA sample of foreign nationals in the Basque Country is small, so quarterly rates jump around; the chart shows a 4-quarter average by default. Eustat counts by place of birth, not nationality, so its figures are not directly comparable with the EPA's.</p>
+      <p>The EPA sample of foreign nationals in the Basque Country is small, so quarterly rates jump around; the chart shows a 4-quarter average by default. Eustat counts by country of birth, not nationality, so its figures are not directly comparable with the EPA's.</p>
     </div>
     <div class="grid">
       <article class="card span-6">
@@ -622,7 +635,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
             <p class="note" id="rgi-note"></p>
           </div>
           <div>
-            <h4>Holders per 100 adults, by place of birth, 2023</h4>
+            <h4>Holders per 100 adults, by country of birth, 2023</h4>
             <p class="sub">RGI holders during the year ÷ people aged 16+ born there</p>
             <div class="chart" id="c-rgi-birth"></div>
           </div>
@@ -639,11 +652,11 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
   <h2>Sources and notes</h2>
   <ul>
     <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=65309" target="_blank" rel="noopener noreferrer">INE, Encuesta de Población Activa (EPA)</a>, tables 65290, 65299, 65300, 65309 and 65336: activity, employment and unemployment by nationality, Spain and Basque Country, quarterly 2002–2026. Survey estimates with sampling error.</li>
-    <li><a href="https://w6.seg-social.es/PXWeb/pxweb/es/Afiliados%20en%20alta%20laboral/" target="_blank" rel="noopener noreferrer">Seguridad Social, PX-Web</a>: average affiliates (foreigners by sex, region, scheme, EU / non-EU; total system), monthly from 2012; affiliates by nationality on the last day of the month.</li>
+    <li><a href="https://w6.seg-social.es/PXWeb/pxweb/es/Afiliados%20en%20alta%20laboral/" target="_blank" rel="noopener noreferrer">Seguridad Social, PX-Web</a>: average affiliates (foreign nationals by sex, region, scheme, EU / non-EU; total system), monthly from 2012; affiliates by nationality on the last day of the month.</li>
     <li><a href="https://www.mites.gob.es/es/estadisticas/anuarios/index.htm" target="_blank" rel="noopener noreferrer">Ministerio de Trabajo, Anuario de Estadísticas</a>, table PEX-1 (SEPE data): foreign recipients of unemployment benefits, annual averages 2013–2024. The Employment Activation Programme existed only in 2015–2020. Table PRD-1: all recipients, used to get Spanish recipients (all − foreign); typed into <code>data/mites_prd1_beneficiarios_2013_2024.csv</code>.</li>
     <li><a href="https://maldita.es/prebunking/20260710/ingreso-minimo-vital-espa%C3%B1oles-extranjeros/" target="_blank" rel="noopener noreferrer">Seguridad Social (INSS), via Maldita.es</a>: IMV recipients by nationality, monthly June 2020 – June 2026 (data released on a transparency request). Per 100 households: households by nationality estimated from residents (Estadística Continua de Población), average household size of all-Spanish and all-foreign households (<a href="https://www.ine.es/jaxiPx/Tabla.htm?tpx=56556" target="_blank" rel="noopener noreferrer">ECEPOV 2021, table 56556</a>) and total households (<a href="https://www.ine.es/jaxiT3/Tabla.htm?t=60135" target="_blank" rel="noopener noreferrer">ECP table 60135</a>), from Jan 2021.</li>
     <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=60258" target="_blank" rel="noopener noreferrer">INE, Encuesta de Condiciones de Vida</a>, tables 60258 and 10009: AROPE and its components by nationality, 2008–2025. AROPE follows the "Europa 2030" definition from 2014; before that only the earlier "Europa 2020" definition exists (dotted line).</li>
-    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=82104" target="_blank" rel="noopener noreferrer">INE, Estadística Continua de Población</a> and <a href="https://www.ine.es/dyngs/Prensa/ECP3T26.htm" target="_blank" rel="noopener noreferrer">press release of 1 Oct 2026</a>: population by nationality and by place of birth (2026 provisional). Half-yearly to 2020, quarterly since 2021.</li>
+    <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=82104" target="_blank" rel="noopener noreferrer">INE, Estadística Continua de Población</a> and <a href="https://www.ine.es/dyngs/Prensa/ECP3T26.htm" target="_blank" rel="noopener noreferrer">press release of 1 Oct 2026</a>: population by nationality and by country of birth (2026 provisional). Half-yearly to 2020, quarterly since 2021.</li>
     <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67129&amp;L=0" target="_blank" rel="noopener noreferrer">INE, Censo anual de población, table 67129</a>: population 16+ by region and province, sex, country of birth (17 countries and the rest of each continent) and relation to activity, 1 Jan 2021–2024. Work status comes from Social Security and employment-office registers.</li>
     <li><a href="https://www.ine.es/jaxiT3/Tabla.htm?t=65290" target="_blank" rel="noopener noreferrer">INE, EPA by region and nationality</a>, tables 65290 (population 16+), 65299 (active) and 65309 (employed): annual averages for the region map. <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67130" target="_blank" rel="noopener noreferrer">INE census table 67130</a>: population 16+ by nationality and relation to activity, by province, 2021–2024, for the province map. <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=69964&amp;L=0" target="_blank" rel="noopener noreferrer">INE census table 69964</a>: employed people by nationality and economic section, by province, 2021–2024. Province shapes simplified from <a href="https://gadm.org" target="_blank" rel="noopener noreferrer">GADM</a>.</li>
     <li><a href="https://www.sepe.es/dctm/informes%3A09019af48026a2c4/RElTRVdFQg%3D%3D/4832-1.pdf" target="_blank" rel="noopener noreferrer">SEPE, Informe del Mercado de Trabajo de las Personas Extranjeras 2026</a> (2025 data): registered unemployment and benefit recipients on 31 Dec 2025; foreign affiliates by scheme, sex, nationality, type of work, age and contract (Seguridad Social, 31 Dec 2025); contracts by type, working time and occupation (SISPE, all of 2025). The report publishes these only in the PDF; the figures were read from it page by page and checked against its own totals (see <code>data/sepe_informe_extranjeros_2025.README.txt</code>).</li>
@@ -651,7 +664,7 @@ footer p, footer li { overflow-wrap: anywhere; }  /* long file names / URLs must
     <li><a href="https://bibliovirtual.inclusion.gob.es/documents/d/asset-library-6602793/indicadores_marco-estrategico-ii" target="_blank" rel="noopener noreferrer">Ministerio de Inclusión, indicadores del Marco Estratégico II</a>: Basque minimum income (RGI) 2024; IMV recipients December 2025.</li>
     <li><a href="https://opendata.euskadi.eus/contenidos/estadistica/estadisticas_ebpgi2023/opendata/2023_Estadistica-de-Personas-Beneficiarias-de-Prestaciones-de-Garantia-de-Ingresos-en-Euskadi.xlsx" target="_blank" rel="noopener noreferrer">Lanbide / Gobierno Vasco, Estadística de personas beneficiarias de prestaciones de garantía de ingresos 2023</a>: RGI holders. The open tables have no nationality or birthplace; those figures are as reported by <a href="https://www.gasteizhoy.com/cuantos-perceptores-rgi-son-extranjeros/" target="_blank" rel="noopener noreferrer">Gasteiz Hoy</a> (27 Aug 2024), and its totals, sex and territory figures match the official tables. Adults by nationality: <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=67130&amp;L=0" target="_blank" rel="noopener noreferrer">INE census table 67130</a>.</li>
   </ul>
-  <p>Shaded periods mark the Great Recession (mid-2008 to 2013) and the COVID year 2020. In January 2007 Romania and Bulgaria joined the EU, so their nationals move from the non-EU to the EU series (dotted line). In 2021 Q1 INE re-based the EPA on new population estimates. No official statistic counts how many foreigners "do not contribute"; Social Security affiliation counts those who do.</p>
+  <p>Shaded periods mark the Great Recession (mid-2008 to 2013) and the COVID year 2020. In January 2007 Romania and Bulgaria joined the EU, so their nationals move from the non-EU to the EU series (dotted line). In 2021 Q1 INE re-based the EPA on new population estimates. No official statistic counts how many foreign nationals "do not contribute"; Social Security affiliation counts those who do.</p>
   <p id="foot-gen"></p>
 </footer>
 
@@ -1435,6 +1448,7 @@ function renderProvMap() {
   sel.value = state.pmGroup;
   const groupLabel = sel.options[sel.selectedIndex].text;
   const isNat = state.pmGroup === 'fxnat';
+  setBasis('c-pm', isNat ? 'nat' : 'birth');
   const natIdx = new Map(REG.censusNat.regions.map((r, i) => [r.code, i]));
   const spainIdx = CEN.countries.findIndex((x) => x.cont === 'spain');
   const members = (() => {
@@ -1687,12 +1701,32 @@ document.addEventListener('click', ev => {
   const a = ev.target.closest('a[href="#epa-vs-census"]');
   if (a) $('#epa-vs-census').open = true;
 });
+// which definition of "foreign" each chart uses (see the Who section); the province map sets its own
+const BASIS = { nat: 'By nationality', birth: 'By country of birth', both: 'By nationality and country of birth' };
+const BASIS_OF = {
+  'c-nb-bar': 'both', 'c-pop': 'both', 'c-shares': 'nat', 'c-rates': 'nat', 'c-lev': 'nat', 'c-count': 'nat', 'c-cen': 'birth',
+  'c-pm': 'nat', 'c-rm': 'nat', 'c-sec': 'nat', 'c-occ': 'nat', 'c-grp': 'nat', 'c-ctype': 'nat', 'c-aff': 'nat', 'c-ctry': 'nat',
+  'c-sch': 'nat', 'c-ben': 'nat', 'c-ben25': 'nat', 'c-brate': 'nat', 'c-imv': 'nat', 'c-pov': 'nat', 'c-pv': 'nat', 'c-pvaff': 'nat',
+  'c-eus': 'birth', 'c-rgi-share': 'both',
+};
+function setBasis(chartId, kind) {
+  const head = document.getElementById(chartId)?.closest('.card')?.querySelector('.head > div');
+  if (!head) return;
+  let tag = head.querySelector('.basis');
+  if (!tag) { tag = document.createElement('span'); head.prepend(tag); }
+  tag.className = 'basis' + (kind === 'birth' ? ' birth' : '');
+  tag.textContent = BASIS[kind];
+}
+Object.entries(BASIS_OF).forEach(([id, k]) => setBasis(id, k));
 function renderAll() {
   const c = C();
   const P = D.population, E = D.epa, A = D.affiliation, B = D.benefits, I = D.imv, V = D.poverty, PV = D.epaPV, S = D.snapshots;
 
   // --- who: nationality x birthplace ---
   const nb = S.nationalityBirth, tot = nb.esBornEs + nb.esBornAbroad + nb.fxBornAbroad + nb.fxBornEs;
+  $('#def-fx-es').textContent = `${fmt(Math.round(nb.fxBornEs / 1000) * 1000)}`;
+  $('#def-date').textContent = dateLabel('D', nb.date);
+  $('#def-es-abroad').textContent = `${(nb.esBornAbroad / 1e6).toFixed(1)} million`;
   $('#nb-sub').textContent = `Population of Spain on ${dateLabel('D', nb.date)}: ${fmt(tot)}`;
   const nbParts = [
     { label: 'Spanish, born in Spain', v: nb.esBornEs, color: c.neutral, ink: css('--fg') },
@@ -2038,7 +2072,7 @@ function renderAll() {
     const totH = N.es.holders + N.fx.holders;
     $('#rgi-foot').textContent = `In ${RX.year}, ${fmt(totH)} people held the RGI at some point, ${fmt(N.fx.holders)} of them foreign nationals `
       + `(${fp(100 * N.fx.holders / totH)}). Each holder claims for a household: 61% of holders lived alone, and children and other household members `
-      + 'are not counted here. The 2023 rates divide holders at any point in the year by adults on 1 Jan. By place of birth, naturalised immigrants count as born abroad.';
+      + 'are not counted here. The 2023 rates divide holders at any point in the year by adults on 1 Jan. By country of birth, naturalised immigrants count as born abroad.';
     const r1 = (v) => v.toFixed(1);
     table('#t-rgi', ['Group', 'Year', 'RGI holders', 'Adults 16+', 'Per 100 adults', 'Source'], [
       ['Spanish nationals (coverage)', 2024, '', '', fp(rg.coverageSpanish), 'Ministerio de Inclusión'],
